@@ -1,0 +1,119 @@
+{
+  "npcs": [
+    {
+      "name": "青岚",
+      "location": "山门遗迹",
+      "attitude": "谨慎",
+      "attitude_value": 15,
+      "present": true,
+      "role": "sword_cultivator",
+      "role_label": "女剑修",
+      "cultivation_level": "筑基后期",
+      "sect": "太虚宗",
+      "dao_heart": "刚正，但心忧同门失踪",
+      "personality": "冷静果决；言简意赅，剑意外露",
+      "goal": "找回失踪师弟，稳住封印",
+      "fear": "禁地深处古剑修残魂苏醒",
+      "current_emotion": "紧绷",
+      "current_action": "按剑而立，目光扫视雾中石阶",
+      "memories": ["青岚奉命入渊查探，已两日未见师弟回音。"],
+      "visual": {
+        "entity_id": "npc:青岚",
+        "role": "female sword cultivator",
+        "description": "young female sword cultivator, cyan robes, jade hairpin, sharp eyes, Chinese storybook ink style, soft lines"
+      }
+    },
+    {
+      "name": "玄尘道人",
+      "location": "山门遗迹",
+      "attitude": "严肃",
+      "attitude_value": 5,
+      "present": true,
+      "role": "elder",
+      "role_label": "道长",
+      "cultivation_level": "金丹初期",
+      "sect": "散修盟",
+      "dao_heart": "守序，愿以己身镇封",
+      "personality": "威严克制；说话简练，带训诫",
+      "goal": "修补结界裂痕，查明污染源头",
+      "fear": "葬仙渊彻底失控波及凡俗山脉",
+      "current_emotion": "忧虑",
+      "current_action": "以拂尘划动符纹，试探结界波动",
+      "memories": ["玄尘道人曾参与上次封渊，知此地凶险。"],
+      "visual": {
+        "entity_id": "npc:玄尘道人",
+        "role": "taoist elder",
+        "description": "elder daoist cultivator, grey beard, worn cyan dao robe, talisman brush, ink wash portrait style"
+      }
+    },
+    {
+      "name": "黑衣散修",
+      "location": "断剑石林",
+      "attitude": "冷淡",
+      "attitude_value": -15,
+      "present": false,
+      "role": "rogue_cultivator",
+      "role_label": "黑衣散修",
+      "cultivation_level": "筑基中期",
+      "sect": "无",
+      "dao_heart": "逐利，不信宗门规矩",
+      "personality": "阴郁寡言；目光游移，戒备极深",
+      "goal": "夺取古剑残灵或禁地秘宝",
+      "fear": "被宗门弟子灭口",
+      "current_emotion": "警惕",
+      "current_action": "藏身石林阴影，观察往来修士",
+      "memories": ["黑衣散修先于众人入渊，行踪可疑。"],
+      "visual": {
+        "entity_id": "npc:黑衣散修",
+        "role": "rogue cultivator",
+        "description": "male rogue cultivator in black cloak, half face shadow, faint crimson spiritual light, storybook ink style"
+      }
+    },
+    {
+      "name": "镇守残魂",
+      "location": "封印祭坛",
+      "attitude": "中立",
+      "attitude_value": 0,
+      "present": false,
+      "role": "ancient_spirit",
+      "role_label": "古修残魂",
+      "cultivation_level": "残魂（化神遗蜕）",
+      "sect": "上古剑宗",
+      "dao_heart": "执念未散，守剑冢不失",
+      "personality": "空灵疏离；语句断续，带远古口音",
+      "goal": "阻止外人破坏封印，亦需有人助其解脱",
+      "fear": "剑冢彻底崩塌",
+      "current_emotion": "沉寂",
+      "current_action": "在祭坛上空若隐若现，剑意若隐若现",
+      "memories": ["残魂为古代剑修所留，与葬仙渊共生数百年。"],
+      "visual": {
+        "entity_id": "npc:镇守残魂",
+        "role": "ancient sword spirit",
+        "description": "translucent ancient sword cultivator spirit, pale cyan glow, broken sword, ink painting ethereal style"
+      }
+    },
+    {
+      "name": "太虚宗弟子",
+      "location": "灵气裂隙",
+      "attitude": "惊慌",
+      "attitude_value": 25,
+      "present": false,
+      "role": "disciple",
+      "role_label": "宗门弟子",
+      "cultivation_level": "练气圆满",
+      "sect": "太虚宗",
+      "dao_heart": "尚浅，心志动摇",
+      "personality": "年轻急躁；易紧张，求救心切",
+      "goal": "活着离开禁地，向宗门报信",
+      "fear": "被灵气裂隙吞噬",
+      "current_emotion": "恐惧",
+      "current_action": "以残存灵力护体，困守裂隙旁",
+      "memories": ["该弟子追踪同门至此，灵力几近耗尽。"],
+      "visual": {
+        "entity_id": "npc:太虚宗弟子",
+        "role": "young disciple",
+        "description": "injured young male cultivator disciple, torn sect robes, kneeling by rift, anxious eyes, soft storybook style"
+      }
+    }
+  ]
+}

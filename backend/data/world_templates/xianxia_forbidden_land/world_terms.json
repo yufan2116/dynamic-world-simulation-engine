@@ -1,0 +1,114 @@
+{
+  "id": "xianxia_forbidden_land",
+  "core": {
+    "currency": "灵石",
+    "settlement": "山门",
+    "danger": "灵气紊乱",
+    "economy": "灵脉稳定度",
+    "authority": "宗门",
+    "crisis": "禁地异变",
+    "tension": "灵气紊乱"
+  },
+  "ui": {
+    "world_panel_title": "天地异象",
+    "world_pulse": "山门流闻",
+    "world_pulse_empty": "灵雾未动，山门流闻尚稀……",
+    "tension_meter": "灵气紊乱",
+    "conflict_meter": "道统冲突",
+    "crisis_block_title": "禁地异变",
+    "crisis_pressure": "异变压力",
+    "suspicious_clues": "残留灵痕",
+    "current_quest": "当前因果",
+    "search_window": "封禁余裕",
+    "event_categories": {
+      "world": "天地",
+      "rumor": "流闻",
+      "npc": "修士",
+      "system": "因果",
+      "crisis": "异变",
+      "economy": "灵脉",
+      "faction": "宗门"
+    }
+  },
+  "economy": {
+    "metrics": [
+      { "key": "spirit_vein_stability", "label": "灵脉稳定度", "initial": 68 },
+      { "key": "pill_circulation", "label": "丹药流通", "initial": 52 },
+      { "key": "spirit_pollution", "label": "灵气污染", "initial": 38 },
+      { "key": "seal_integrity", "label": "禁制完整度", "initial": 45 }
+    ],
+    "events": [
+      {
+        "flag": "vein_unstable",
+        "text": "【灵脉】葬仙渊外围灵脉震荡，低阶修士吐纳受阻。"
+      },
+      {
+        "flag": "pill_shortage",
+        "text": "【灵脉】丹药流通骤减，疗伤丹价在散修间飙升。"
+      },
+      {
+        "flag": "seal_crack_spread",
+        "text": "【灵脉】禁制裂痕向祭坛方向蔓延，灵气污染加重。"
+      }
+    ]
+  },
+  "crisis": {
+    "subject_status_key": "case_status",
+    "faction_primary": "太虚宗",
+    "faction_hostile": "禁地邪修",
+    "status_labels": {
+      "missing": "弟子失联",
+      "clue_surface": "灵痕显现",
+      "injured": "重伤未陨",
+      "relocated": "被引至深处",
+      "plea_letter": "残魂示警",
+      "rescue_window_narrow": "封禁将闭",
+      "dead": "魂灯熄灭",
+      "resolved": "异变暂镇"
+    },
+    "level_labels": {
+      "stable": "禁地尚可",
+      "rising": "禁地异变加剧",
+      "volatile": "灵脉动荡",
+      "severe": "异变失控边缘",
+      "critical": "裂隙将崩"
+    },
+    "risk_notes": {
+      "case_worsening": "禁地异变正在加剧",
+      "hostile_activity": "邪修势力躁动",
+      "window_shrinking": "封禁余裕正在缩小"
+    },
+    "tension_summary": "葬仙渊结界不稳，灵气污染蔓延"
+  },
+  "rumor_auto": [
+    { "text": "灵气裂隙方向传来剑鸣，似有人在斗法。", "origin_from_location": true },
+    { "text": "封印祭坛方向黑气翻涌，长老令弟子不得靠近。", "origin": "封印祭坛", "credibility": 0.8, "min_tension": 50 }
+  ],
+  "role_labels": {
+    "sword_cultivator": "女剑修",
+    "elder": "道长",
+    "taoist elder": "道长",
+    "rogue_cultivator": "黑衣散修",
+    "rogue cultivator": "散修",
+    "ancient_spirit": "古修残魂",
+    "ancient sword spirit": "剑修残魂",
+    "disciple": "宗门弟子",
+    "young disciple": "外门弟子",
+    "female sword cultivator": "女剑修"
+  },
+  "clue_vocabulary": ["剑气残痕", "灵力波动", "残魂气息", "阵法碎片", "灵石裂痕", "血色符纸"],
+  "narrative_clues": {
+    "investigate_success": "你在{location}捕捉到异常灵息残留",
+    "currency_clue": "半块碎裂灵石，纹路古老",
+    "seal_clue": "封印阵纹被人动过手脚"
+  },
+  "crisis_events": [
+    { "id": "clue_spirit_mark", "tier": 20, "text": "【异变】断剑石林出现新鲜剑气残痕，灵息紊乱。", "repeatable": false },
+    { "id": "rift_pulse", "tier": 20, "text": "【异变】灵气裂隙脉动加剧，附近灵草尽枯。", "repeatable": false },
+    { "id": "disciple_trace", "tier": 40, "text": "【异变】太虚宗弟子遗留的玉牌碎裂，指向祭坛方向。", "repeatable": false },
+    { "id": "seal_whisper", "tier": 40, "text": "【异变】封印祭坛传来低语，似古修残魂苏醒。", "repeatable": false },
+    { "id": "evil_stir", "tier": 60, "text": "【异变】禁地邪修在裂隙边缘布阵，黑气缠石。", "repeatable": false },
+    { "id": "soul_awaken", "tier": 60, "text": "【异变】地下剑冢钟鸣再起，残魂气息外泄。", "repeatable": false },
+    { "id": "pollution_spread", "tier": 80, "text": "【异变】灵气污染越过山门，低阶弟子灵力逆行。", "repeatable": true }
+  ]
+}

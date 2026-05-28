@@ -1,0 +1,6 @@
+{
+  "monsters": [
+    {"id": "bandit", "name": "强盗", "cr": "1/8", "ac": 12, "hp": 11},
+    {"id": "varick", "name": "瓦里克", "cr": "2", "ac": 15, "hp": 45, "note": "强盗首领"}
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "npcs": [
+    {
+      "name": "托马斯",
+      "location": "村口",
+      "attitude": "怀疑",
+      "attitude_value": -10,
+      "present": true,
+      "memories": [
+        "守卫托马斯在村口执勤，对陌生人保持警惕。",
+        "昨夜仓库方向有人影，队长下令不得张扬。"
+      ],
+      "profile": {
+        "role": "村庄守卫",
+        "personality": "谨慎忠诚",
+        "goal": "保护村庄、查明仓库异动",
+        "fear": "失职被问责",
+        "faction": "村庄守卫",
+        "schedule": {
+          "清晨": "村口",
+          "正午": "仓库",
+          "傍晚": "村口",
+          "深夜": "村口"
+        }
+      },
+      "current_action": "站在木栅栏旁观察进出人群，偶尔看向仓库方向"
+    },
+    {
+      "name": "米拉",
+      "location": "酒馆",
+      "attitude": "担忧",
+      "attitude_value": 20,
+      "present": true,
+      "memories": [
+        "米拉是酒馆老板，最近生意因商人失踪而冷清。",
+        "马库斯失踪前曾在酒馆喝过一杯。"
+      ],
+      "profile": {
+        "role": "酒馆老板娘",
+        "personality": "务实善良",
+        "goal": "维持酒馆生意、帮助艾琳娜",
+        "fear": "村庄衰落",
+        "faction": "村民",
+        "schedule": {
+          "清晨": "酒馆",
+          "正午": "酒馆",
+          "傍晚": "酒馆",
+          "深夜": "酒馆"
+        }
+      },
+      "current_action": "擦拭吧台，留意门口动静"
+    },
+    {
+      "name": "艾琳娜",
+      "location": "村口",
+      "attitude": "悲伤",
+      "attitude_value": 30,
+      "present": true,
+      "memories": [
+        "艾琳娜在村口向路人哭诉，父亲马库斯昨夜未归。",
+        "父亲说只是去仓库清点货物。"
+      ],
+      "profile": {
+        "role": "商人女儿",
+        "personality": "坚韧悲伤",
+        "goal": "找到父亲马库斯",
+        "fear": "永远失去父亲",
+        "faction": "村民",
+        "schedule": {
+          "清晨": "酒馆",
+          "正午": "村口",
+          "傍晚": "酒馆",
+          "深夜": "酒馆"
+        }
+      },
+      "current_action": "在广场边缘徘徊，向每位过路人打听消息"
+    },
+    {
+      "name": "瓦里克",
+      "location": "森林小路",
+      "attitude": "敌对",
+      "attitude_value": -60,
+      "present": false,
+      "memories": [
+        "强盗首领瓦里克盘踞在森林小路，手下最近活动频繁。"
+      ],
+      "profile": {
+        "role": "强盗首领",
+        "personality": "残忍狡诈",
+        "goal": "控制商路与走私货物",
+        "fear": "被王国骑兵围剿",
+        "faction": "强盗",
+        "schedule": {
+          "清晨": "森林小路",
+          "正午": "森林小路",
+          "傍晚": "森林小路",
+          "深夜": "森林小路"
+        }
+      },
+      "current_action": "（未现身）部下在林间巡逻"
+    }
+  ]
+}

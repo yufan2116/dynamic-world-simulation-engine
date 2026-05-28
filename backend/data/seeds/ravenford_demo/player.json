@@ -1,0 +1,12 @@
+{
+  "name": "凯尔",
+  "class_name": "骑士",
+  "background": "北境战争侦察兵，战后以调查委托为生",
+  "strength": 14,
+  "dexterity": 15,
+  "constitution": 13,
+  "intelligence": 12,
+  "wisdom": 13,
+  "charisma": 11,
+  "equipment": ["短剑", "旧皮甲", "调查笔记", "褪色军徽"]
+}

@@ -1,0 +1,30 @@
+{
+  "factions": {
+    "村庄守卫": {
+      "power": 58,
+      "aggression": 22,
+      "goal": "维持秩序、控制仓库消息外泄",
+      "mood": "警戒",
+      "relation_to_player": "观望"
+    },
+    "村民": {
+      "power": 42,
+      "aggression": 5,
+      "goal": "求安、找到马库斯",
+      "mood": "不安",
+      "relation_to_player": "期待"
+    },
+    "强盗": {
+      "power": 38,
+      "aggression": 58,
+      "goal": "控制商路",
+      "mood": "伺机而动",
+      "relation_to_player": "未知"
+    }
+  },
+  "faction_reputation": {
+    "村庄守卫": 40,
+    "村民": 32,
+    "强盗": -20
+  }
+}

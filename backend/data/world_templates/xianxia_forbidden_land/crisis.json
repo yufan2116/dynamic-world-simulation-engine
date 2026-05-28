@@ -1,0 +1,15 @@
+{
+  "crisis": {
+    "id": "forbidden_seal_breach",
+    "pressure": 55,
+    "stage": "escalation",
+    "seal_status": "unstable",
+    "case_status": "missing"
+  },
+  "flags": {
+    "seal_inspected": false,
+    "rift_found": false,
+    "ancient_spirit_contacted": false,
+    "spiritual_pollution": 40
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "rumors": [
+    {
+      "id": "demo_r1",
+      "text": "黑森林方向最近常有商队失踪，雾中似有东西游荡。",
+      "origin": "村口",
+      "spread_to": ["村口", "酒馆"],
+      "credibility": 0.6,
+      "known_by": [],
+      "age_ticks": 0
+    },
+    {
+      "id": "demo_r2",
+      "text": "有人看见马库斯昨夜往仓库方向去，再也没回来。",
+      "origin": "酒馆",
+      "spread_to": ["酒馆", "村口"],
+      "credibility": 0.75,
+      "known_by": ["米拉"],
+      "age_ticks": 0
+    }
+  ]
+}

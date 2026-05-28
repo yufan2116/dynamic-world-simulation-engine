@@ -1,0 +1,26 @@
+{
+  "base_style": "European medieval fantasy storybook cartoon, hand-drawn, soft cel shading, whimsical village and torchlight, non-photorealistic",
+  "prompt_suffix": "European picture-book illustration, hand-drawn line art, soft cel shading, whimsical dark fantasy, muddy realism tones",
+  "guardrail": "European picture-book illustration, hand-drawn line art, soft cel shading, whimsical fantasy, gentle vibrant colors, child-friendly storybook aesthetic, absolutely NOT photorealistic, NOT oil painting, NOT cinematic realism, NOT 3D render, no text, no watermark",
+  "banner_motifs": ["village gate", "torches", "stone walls", "rain puddles"],
+  "player_portrait_roles": {
+    "骑士": { "role": "knight", "description": "heroic male knight, plate armor, sword, confident" },
+    "战士": { "role": "warrior", "description": "heroic male warrior, plate armor, sword" },
+    "法师": { "role": "mage", "description": "female mage, blue robes, glowing staff, mystical" },
+    "游侠": { "role": "ranger", "description": "male ranger, green cloak, bow, forest background" },
+    "盗贼": { "role": "rogue", "description": "female rogue, dark hood, daggers, sneaky expression" }
+  },
+  "ui_theme": {
+    "id": "medieval",
+    "accent": "#7b5ea7",
+    "gold": "#c9a227",
+    "bg": "#0f0e14",
+    "panel": "#1a1824",
+    "border": "#3d3550",
+    "text": "#e8e0d5",
+    "muted": "#9a8f82",
+    "fontFamily": "Georgia, Cambria, Times New Roman, serif",
+    "panelTexture": "stone",
+    "atmosphere": "dark gold medieval"
+  }
+}

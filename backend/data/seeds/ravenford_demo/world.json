@@ -1,0 +1,22 @@
+{
+  "seed_id": "ravenford_demo",
+  "template_id": "medieval_dark_fantasy",
+  "title": "Ravenford — 失踪商人（演示）",
+  "background": "雷文福德是边境村庄。昨夜商人马库斯前往仓库清点货物后失踪，女儿艾琳娜在村口求助，守卫托马斯加强盘查，酒馆老板娘米拉听到不少流言。此后局势由世界模拟动态推进，无固定日程剧本。",
+  "chapter": {
+    "number": 1,
+    "title": "失踪的商人"
+  },
+  "village_name": "Ravenford",
+  "default_location": "村口",
+  "day": 1,
+  "time_of_day": "清晨",
+  "weather": "暴雨初歇",
+  "world_minutes": 480,
+  "clock": "08:00",
+  "village_panic": 38,
+  "danger_level": "中",
+  "war_risk": 28,
+  "opening_scene": true,
+  "scene_npcs": ["托马斯", "艾琳娜"]
+}

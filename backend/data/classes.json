@@ -1,0 +1,7 @@
+{
+  "classes": [
+    {"id": "ranger", "name": "游侠", "hit_die": 10, "primary_abilities": ["DEX", "WIS"]},
+    {"id": "fighter", "name": "战士", "hit_die": 10, "primary_abilities": ["STR", "CON"]},
+    {"id": "rogue", "name": "游荡者", "hit_die": 8, "primary_abilities": ["DEX"]}
+  ]
+}

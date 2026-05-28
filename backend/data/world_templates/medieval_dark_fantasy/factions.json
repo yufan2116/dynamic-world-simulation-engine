@@ -1,0 +1,24 @@
+{
+  "faction_reputation": {
+    "村庄守卫": 40,
+    "村民": 30,
+    "强盗": -20
+  },
+  "factions": {
+    "村庄守卫": {
+      "power": 55,
+      "mood": "紧张",
+      "relation_to_player": "中立"
+    },
+    "村民": {
+      "power": 70,
+      "mood": "恐慌",
+      "relation_to_player": "观望"
+    },
+    "强盗": {
+      "power": 35,
+      "mood": "挑衅",
+      "relation_to_player": "敌对"
+    }
+  }
+}

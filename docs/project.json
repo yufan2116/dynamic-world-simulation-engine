@@ -1,0 +1,362 @@
+{
+  "schemaVersion": "1.0",
+  "id": "dynamic-world-simulation-engine",
+  "slug": "dynamic-world-simulation-engine",
+  "title": "Dynamic World Simulation Engine",
+  "subtitle": "确定性世界模拟 + LLM 叙事层的 CRPG 运行时",
+  "category": "AI Runtime / Interactive Narrative",
+  "status": "Completed",
+  "featured": true,
+  "priority": 10,
+
+  "summary": {
+    "oneLine": "规则引擎维护可验证世界状态，LLM 只负责叙事与选项润色，支持多世界模板一键切换。",
+    "short": "Dynamic World Simulation Engine 是一款可运行的动态世界 RPG 原型：后端用确定性模拟（地点、NPC、危机、派系、谣言、经济）驱动状态变化，LLM 仅根据已发生事件生成叙事与内嵌选项，避免「换皮」式幻觉剧情。项目包含中世纪奇幻与仙侠两套完整世界模板、D20 检定、SQLite 持久化、按 Prompt 哈希缓存的 AI 场景/立绘，以及 React 叙事流 UI。",
+    "problem": "传统 AI 文字冒险常让模型直接「编世界」，导致地点、NPC、线索前后矛盾，且难以切换题材时真正替换规则与术语，玩家体验停留在换文案的换皮层。",
+    "solution": "将「世界真相」交给可测试的规则与 JSON 模板，LLM 只读事件日志做叙事渲染；通过 World Template、语义层（World Ontology）与内嵌选项管线，实现多世界数据、危机、UI 术语与插图风格的完整切换。"
+  },
+
+  "role": {
+    "title": "Creator & Full-Stack Developer",
+    "responsibilities": [
+      "设计「确定性模拟 + 叙事层」分层架构与世界模板数据规范",
+      "实现 FastAPI 游戏循环、规则引擎、危机/谣言/派系等子系统",
+      "构建 React 叙事流、模板切换、WebSocket 图像进度与内嵌选项交互"
+    ],
+    "contributions": [
+      "落地多世界模板系统（medieval_dark_fantasy / xianxia_forbidden_land），每模板 9 类 JSON 配置",
+      "实现 choice_renderer 叙事化选项与刷新后选项自动恢复",
+      "完成图像 Prompt 哈希缓存、占位图与按模板画风 Guardrail"
+    ]
+  },
+
+  "techStack": {
+    "frontend": ["React 18", "TypeScript", "Vite", "Tailwind CSS", "Axios"],
+    "backend": ["Python 3.10+", "FastAPI", "Uvicorn", "Pydantic v2"],
+    "ai": ["DeepSeek API（叙事/意图）", "OpenAI Images API（可选立绘/场景）", "确定性 Fallback 叙事"],
+    "database": ["SQLite（aiosqlite）", "游戏状态 / 事件 / NPC 记忆 / 图像缓存"],
+    "infra": ["WebSocket（图像生成进度）", "Vite Dev Proxy"],
+    "tools": ["Git", "dotenv"]
+  },
+
+  "highlights": [
+    "确定性世界状态",
+    "多世界模板",
+    "叙事内嵌选项",
+    "D20 规则引擎"
+  ],
+
+  "features": [
+    "多世界模板热切换：地点、NPC、派系、危机、谣言、开场叙事与 UI 术语一并替换",
+    "每回合：意图解析 → D20 检定 → 世界模拟 Tick → 事件持久化 → LLM 叙事 → 内嵌 CRPG 选项",
+    "动态危机升级、谣言传播图、派系博弈与模板化经济模拟",
+    "AI 肖像/场景图按 Prompt MD5 缓存，WebSocket 推送生成进度",
+    "序幕 + 主叙事流、世界态势面板、自由文本行动与叙事选项并行",
+    "离线时间追赶（offline sim）与叙事历史刷新恢复"
+  ],
+
+  "sections": [
+    {
+      "id": "background",
+      "title": "项目背景",
+      "type": "text",
+      "content": "项目源于对「AI 跑团 / 文字冒险」可靠性的探索：玩家需要可推理、可存档、可复盘的世界，而不是模型即兴编造。MVP 以「失踪商人」中世纪剧本验证核心链路，并扩展至仙侠「葬仙渊」模板，证明同一引擎可承载不同题材的规则与语义，而非仅替换文案与图片。\n\n设计铁律：世界状态仅由 world_simulator、rule_engine 与各 Tick 子系统修改；LLM 提示词禁止杜撰未在事件日志中出现的事实；无 API Key 时回退到确定性叙事模板。"
+    },
+    {
+      "id": "architecture",
+      "title": "系统架构",
+      "type": "architecture",
+      "content": {
+        "overview": "玩家输入 → 意图解析 → D20 检定 → 世界模拟（危机/谣言/派系/经济 Tick）→ SQLite 事件与记忆 → LLM 叙事 → choice_renderer 内嵌选项 → 前端叙事流",
+        "image": "architecture.png",
+        "modules": [
+          {
+            "name": "GameLoop",
+            "description": "编排开局、行动处理、状态持久化与 API 响应打包（含 inline_choices、图像 URL）"
+          },
+          {
+            "name": "World Template Manager",
+            "description": "加载 world_templates 下 JSON  bundle，创建 GameState 并注入语义层与图像实体注册表"
+          },
+          {
+            "name": "World Simulator + Rule Engine",
+            "description": "确定性修改地点、NPC、旗帜与检定结果；LLM 不可直接写世界"
+          },
+          {
+            "name": "Crisis / Rumor / Faction / Economy Sim",
+            "description": "按模板分叉的危机升级、谣言扩散、派系力量与经济指标 Tick"
+          },
+          {
+            "name": "Narrative Engine + Choice Renderer",
+            "description": "基于事件日志生成 HTML 叙事，并将 available_actions 转为叙事化内嵌选项"
+          },
+          {
+            "name": "Image Service + WebSocket Hub",
+            "description": "按模板画风生成/缓存立绘与场景，推送生成进度至前端"
+          },
+          {
+            "name": "React Narrative UI",
+            "description": "叙事流、内嵌选项、世界面板、模板选择与自由输入底栏"
+          }
+        ]
+      }
+    },
+    {
+      "id": "technical-highlights",
+      "title": "技术亮点",
+      "type": "features",
+      "content": [
+        "World Ontology 语义层：core / ui / economy / crisis / role_labels 等术语随模板注入 flags，前端统一 uiTerm 渲染",
+        "action_generator 按场景动态生成分组行动，choice_renderer 评分选取 Top-N 并润色为扮演式选项",
+        "narrative_log 持久化带选项 HTML，刷新后 extractChoicesFromHtml + get_state 双通道恢复选项",
+        "图像实体 registry（player:portrait / loc:* / npc:*）与模板级会话缓存，避免切回模板重复生图",
+        "仙侠与中世纪危机分叉（crisis_xianxia vs crisis_escalation），避免单一剧本硬编码"
+      ]
+    },
+    {
+      "id": "challenges",
+      "title": "技术挑战与解决方案",
+      "type": "challenges",
+      "content": [
+        {
+          "title": "LLM 幻觉 vs 世界一致性",
+          "problem": "若让模型直接决定剧情走向，会出现未解锁 NPC、错误地点与矛盾线索。",
+          "solution": "所有状态变更走 world_simulator；叙事 prompt 仅包含事件日志与当前 flags；无 Key 时使用 fallback 叙事。"
+        },
+        {
+          "title": "多世界「换皮」问题",
+          "problem": "切换题材后仍出现酒馆、粮价、失踪案等中世纪语义。",
+          "solution": "每模板独立 JSON（含 world_terms.json）+ attach_ontology_to_state；经济与危机模块按 is_xianxia 分叉。"
+        },
+        {
+          "title": "选项展示与刷新丢失",
+          "problem": "底栏备用面板与刷新后 inline_choices 缺失导致无法操作。",
+          "solution": "选项仅内嵌叙事流；开局写入 narrative_with_choices；get_state 返回当前 inline_choices；谣言等运行时补全 id。"
+        },
+        {
+          "title": "图像成本与切换体验",
+          "problem": "换模板或重进游戏时重复调用图像 API，加载慢。",
+          "solution": "Prompt MD5 文件缓存 + completed/total 判断是否跳过 ensure_template_assets；前端按 templateId 会话缓存 URL。"
+        }
+      ]
+    }
+  ],
+
+  "metrics": [
+    {
+      "label": "世界模板",
+      "value": "2+",
+      "description": "中世纪奇幻、仙侠禁地（可扩展 registry）",
+      "trend": "optimal"
+    },
+    {
+      "label": "模板配置维度",
+      "value": "9 JSON / 模板",
+      "description": "world / locations / npcs / factions / rumors / crisis / art / narrative / world_terms",
+      "trend": "optimal"
+    },
+    {
+      "label": "API 回合延迟",
+      "value": "2–8s",
+      "description": "含 LLM 叙事时（视模型与网络）",
+      "trend": "neutral"
+    },
+    {
+      "label": "图像缓存命中",
+      "value": "按 hash",
+      "description": "同 Prompt 不重复调用 Images API",
+      "trend": "optimal"
+    }
+  ],
+
+  "media": {
+    "cover": "cover.png",
+    "hero": "hero.png",
+    "demo": "demo.gif",
+    "video": "demo.mp4",
+    "screenshots": [
+      {
+        "title": "叙事流与内嵌选项",
+        "description": "主叙事区展示节拍化 HTML 与「你现在可以」编号选项，底栏仅保留自由输入",
+        "file": "screenshots/01-narrative-choices.png"
+      },
+      {
+        "title": "世界模板切换",
+        "description": "左侧模板选择器切换 medieval / xianxia，联动 UI 主题与术语",
+        "file": "screenshots/02-template-switch.png"
+      },
+      {
+        "title": "世界态势面板",
+        "description": "危机压力、社会紧张、线索与模板化事件流",
+        "file": "screenshots/03-world-panel.png"
+      },
+      {
+        "title": "场景与立绘",
+        "description": "按模板画风生成的场景横幅与角色立绘（哈希缓存）",
+        "file": "screenshots/04-scene-portrait.png"
+      }
+    ]
+  },
+
+  "demo": {
+    "available": true,
+    "mode": "本地开发（需配置 backend/.env）",
+    "commands": [
+      "cd backend && pip install -r requirements.txt",
+      "uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+      "cd frontend && npm install && npm run dev"
+    ],
+    "scenarios": [
+      "POST /game/start 开局 → 序幕后主叙事自动出现内嵌选项",
+      "切换世界模板至 xianxia_forbidden_land，观察术语/危机/UI 主题变化",
+      "选择叙事选项或底栏自由输入 → 查看 D20 检定与世界事件反馈",
+      "刷新页面后选项与叙事历史从 SQLite + get_state 恢复"
+    ]
+  },
+
+  "links": {
+    "github": "",
+    "demo": "http://localhost:5173",
+    "docs": "",
+    "video": ""
+  },
+
+  "resumeBullets": {
+    "zh": [
+      "设计并实现「确定性世界模拟 + LLM 叙事层」架构，将状态变更与叙事生成解耦，降低 AI 跑团幻觉",
+      "构建多世界 JSON 模板系统（地点/NPC/危机/语义/画风），支持中世纪与仙侠完整切换",
+      "开发 FastAPI 游戏循环、D20 规则引擎、危机/谣言/派系 Tick 及 SQLite 事件持久化",
+      "实现 React 叙事流 UI、内嵌 CRPG 选项、WebSocket 图像进度与 Prompt 哈希缓存"
+    ],
+    "en": [
+      "Architected a deterministic world simulation runtime with LLM-only narrative rendering to prevent state hallucinations in AI-driven RPGs",
+      "Built a multi-world JSON template system (locations, NPCs, crisis, ontology, art) supporting medieval fantasy and xianxia themes",
+      "Implemented FastAPI game loop, D20 rule engine, crisis/rumor/faction ticks, and SQLite event persistence",
+      "Delivered React narrative UI with inline choices, WebSocket image progress, and hash-based image caching"
+    ]
+  },
+
+  "interview": {
+    "pitchZh": "这是一个把 AI 文字冒险做成「可验证世界」的运行时：规则引擎和 JSON 模板管真相，LLM 只根据事件日志写故事和选项；同一套代码能跑中世纪查案和仙侠禁地，而不是换几段文案。",
+    "pitchEn": "A runtime that keeps world truth in deterministic simulation and JSON templates while the LLM only narrates logged events—supporting full theme switches (medieval vs xianxia), not just reskinned text.",
+    "qa": [
+      {
+        "q": "为什么不让 LLM 直接决定剧情？",
+        "a": "状态必须可回放、可测试。模型擅长语言，不擅长长期一致的状态机；因此由 world_simulator 改状态，LLM 只读 events 输出叙事。"
+      },
+      {
+        "q": "多世界模板如何避免换皮？",
+        "a": "每模板独立 locations/npcs/crisis/world_terms 等 9 类配置，引擎层 crisis_xianxia、economy_sim 等按模板分叉，UI 通过 world_ontology 读术语。"
+      },
+      {
+        "q": "选项是如何生成并展示的？",
+        "a": "action_generator 按当前场景生成分组行动，choice_renderer 评分取 Top-N 润色为叙事选项，API 返回 inline_choices；前端只在叙事流展示，刷新时从 HTML 或 get_state 恢复。"
+      }
+    ]
+  },
+
+  "tags": [
+    "AI RPG",
+    "World Simulation",
+    "LLM Narrative",
+    "FastAPI",
+    "React",
+    "Game Engine"
+  ],
+  "targetRoles": [
+    "AI Engineer",
+    "Full-Stack Developer",
+    "Game Tools Engineer"
+  ],
+
+  "runtime": {
+    "stateMachine": [
+      {
+        "state": "uninitialized",
+        "label": "未初始化",
+        "description": "无存档，等待 /game/start 或 /game/load-template",
+        "transitions": "prologue | playing"
+      },
+      {
+        "state": "prologue",
+        "label": "序幕",
+        "description": "展示开场序幕，主叙事与选项已就绪，横幅处于序幕样式",
+        "transitions": "playing"
+      },
+      {
+        "state": "playing",
+        "label": "进行中",
+        "description": "玩家可选择内嵌选项或自由输入，每回合触发模拟与叙事",
+        "transitions": "processing | playing"
+      },
+      {
+        "state": "processing",
+        "label": "回合处理",
+        "description": "后端执行意图解析、检定、世界 Tick、LLM 叙事与选项打包",
+        "transitions": "playing"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "1",
+        "time": "00:00.000",
+        "type": "status",
+        "label": "加载世界模板",
+        "detail": "world_template_manager 构建 GameState 与 image_entities",
+        "status": "done"
+      },
+      {
+        "id": "2",
+        "time": "00:01.000",
+        "type": "status",
+        "label": "返回开场叙事与 inline_choices",
+        "detail": "choice_renderer 打包选项，可选异步生图",
+        "status": "done"
+      },
+      {
+        "id": "3",
+        "time": "00:05.000",
+        "type": "action",
+        "label": "玩家行动",
+        "detail": "POST /game/action",
+        "status": "done"
+      },
+      {
+        "id": "4",
+        "time": "00:06.000",
+        "type": "status",
+        "label": "世界 Tick",
+        "detail": "危机 / 谣言 / 派系 / 经济 simulation",
+        "status": "done"
+      },
+      {
+        "id": "5",
+        "time": "00:08.000",
+        "type": "status",
+        "label": "叙事与选项更新",
+        "detail": "append_narrative + 前端叙事流追加",
+        "status": "done"
+      }
+    ],
+    "recovery": [
+      {
+        "id": "refresh",
+        "title": "刷新恢复",
+        "description": "GET /game/state 恢复 narrative_history、inline_choices 与 available_actions",
+        "icon": "RefreshCw"
+      },
+      {
+        "id": "fallback-narrative",
+        "title": "无 Key 降级",
+        "description": "未配置 LLM Key 时使用确定性 fallback 叙事，核心模拟仍可运行",
+        "icon": "Shield"
+      },
+      {
+        "id": "image-cache",
+        "title": "图像缓存",
+        "description": "storage/images/{hash}.png 命中则跳过 Images API",
+        "icon": "Image"
+      }
+    ]
+  }
+}

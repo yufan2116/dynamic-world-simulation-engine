@@ -1,0 +1,94 @@
+{
+  "id": "medieval_dark_fantasy",
+  "core": {
+    "currency": "银币",
+    "settlement": "村庄",
+    "danger": "战争风险",
+    "economy": "粮价",
+    "authority": "守卫",
+    "crisis": "失踪案",
+    "tension": "村庄恐慌"
+  },
+  "ui": {
+    "world_panel_title": "世界态势",
+    "world_pulse": "世界脉搏",
+    "world_pulse_empty": "村庄尚在沉睡，等待第一个涟漪……",
+    "tension_meter": "村庄恐慌",
+    "conflict_meter": "战争风险",
+    "crisis_block_title": "失踪案",
+    "crisis_pressure": "危机压力",
+    "suspicious_clues": "可疑线索",
+    "current_quest": "当前任务",
+    "search_window": "追查窗口",
+    "event_categories": {
+      "world": "世界",
+      "rumor": "传闻",
+      "npc": "人物",
+      "system": "系统",
+      "crisis": "危机",
+      "economy": "经济",
+      "faction": "派系"
+    }
+  },
+  "economy": {
+    "metrics": [
+      { "key": "tavern_income", "label": "酒馆收入", "initial": 100 },
+      { "key": "grain_price", "label": "粮价", "initial": 10 }
+    ],
+    "events": [
+      {
+        "flag": "mira_struggling",
+        "text": "【经济】酒馆生意惨淡，米拉不得不拖欠供应商货款。"
+      },
+      {
+        "flag": "mira_debt_crisis",
+        "text": "【经济】米拉陷入严重债务，她可能被迫向可疑势力借钱。"
+      }
+    ]
+  },
+  "crisis": {
+    "subject_status_key": "merchant_status",
+    "faction_primary": "村庄守卫",
+    "faction_hostile": "强盗",
+    "status_labels": {
+      "missing": "下落不明",
+      "clue_surface": "出现新线索",
+      "injured": "受伤但存活",
+      "relocated": "被转移他处",
+      "plea_letter": "留下求救讯息",
+      "rescue_window_narrow": "救援窗口收窄",
+      "dead": "确认遇难",
+      "resolved": "案情已破"
+    },
+    "level_labels": {
+      "stable": "局势尚可",
+      "rising": "失踪案正在恶化",
+      "volatile": "局势动荡",
+      "severe": "危机加剧",
+      "critical": "濒临失控"
+    },
+    "risk_notes": {
+      "case_worsening": "失踪案正在恶化",
+      "hostile_activity": "强盗活动加剧",
+      "window_shrinking": "搜索窗口正在缩小"
+    },
+    "tension_summary": "商人马库斯失踪，村庄不安"
+  },
+  "rumor_auto": [
+    { "text": "有人说昨夜仓库有打斗声。", "origin_from_location": true },
+    { "text": "强盗袭击了仓库外围，守卫伤亡不明。", "origin": "村口", "credibility": 0.85, "min_panic": 55 }
+  ],
+  "role_labels": {
+    "guard": "村庄守卫",
+    "innkeeper": "酒馆掌柜",
+    "merchant daughter": "商人之女",
+    "bandit leader": "强盗首领"
+  },
+  "clue_vocabulary": ["泥印", "银币划痕", "货箱翻痕", "马蹄印", "血迹"],
+  "narrative_clues": {
+    "investigate_success": "你在{location}发现与失踪案相关的痕迹",
+    "currency_clue": "一枚带划痕的银币",
+    "warehouse_clue": "旧仓库与昨夜货物有关"
+  },
+  "locations_medieval_only": ["村口", "酒馆", "仓库", "森林小路"]
+}

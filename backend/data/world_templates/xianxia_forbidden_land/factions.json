@@ -1,0 +1,30 @@
+{
+  "faction_reputation": {
+    "太虚宗": 45,
+    "散修盟": 20,
+    "上古剑宗遗脉": 0,
+    "禁地邪修": -50
+  },
+  "factions": {
+    "太虚宗": {
+      "power": 60,
+      "mood": "紧张",
+      "relation_to_player": "观望"
+    },
+    "散修盟": {
+      "power": 40,
+      "mood": "谨慎",
+      "relation_to_player": "中立"
+    },
+    "上古剑宗遗脉": {
+      "power": 25,
+      "mood": "沉寂",
+      "relation_to_player": "未知"
+    },
+    "禁地邪修": {
+      "power": 30,
+      "mood": "躁动",
+      "relation_to_player": "敌对"
+    }
+  }
+}

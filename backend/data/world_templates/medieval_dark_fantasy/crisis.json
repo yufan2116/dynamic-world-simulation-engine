@@ -1,0 +1,13 @@
+{
+  "crisis": {
+    "id": "merchant_missing",
+    "pressure": 35,
+    "stage": "investigation",
+    "merchant_status": "missing"
+  },
+  "flags": {
+    "warehouse_searched": false,
+    "clue_found": false,
+    "varick_revealed": false
+  }
+}

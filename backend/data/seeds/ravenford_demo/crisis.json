@@ -1,0 +1,30 @@
+{
+  "crisis": {
+    "pressure": 18.0,
+    "prev_pressure": 18.0,
+    "max_tier_reached": 0,
+    "merchant_status": "missing",
+    "merchant_location_hint": null,
+    "search_window": 100,
+    "recent_anomalies": [
+      "商人马库斯昨夜未归",
+      "仓库方向夜间有人影"
+    ],
+    "suspicious_clues": [],
+    "risk_notes": [
+      "演示种子：危机将随调查、派系与谣言动态变化"
+    ],
+    "fired_event_ids": [],
+    "player_rest_ticks": 0,
+    "investigation_score": 0
+  },
+  "flags": {
+    "warehouse_searched": false,
+    "clue_found": false,
+    "varick_revealed": false,
+    "thomas_alerted": false,
+    "guard_info": false,
+    "warehouse_noise": false,
+    "quest_urgency": 0
+  }
+}

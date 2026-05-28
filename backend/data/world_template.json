@@ -1,0 +1,29 @@
+{
+  "id": "missing_merchant",
+  "name": "失踪商人的调查",
+  "default_style": "medieval fantasy",
+  "style_description": "European storybook illustration, hand-drawn line art, soft cel shading, whimsical fantasy, non-photorealistic, no text, no watermark",
+  "style_presets": {
+    "medieval fantasy": "medieval European fantasy, castles and villages, chainmail and leather",
+    "xianxia": "Chinese xianxia cultivation fantasy, flowing robes, misty mountains, ink-wash influence",
+    "cyberpunk": "cyberpunk neon city, rain-slick streets, holographic signs, high-tech low-life"
+  },
+  "location_asset_keys": {
+    "村口": "village_gate_night",
+    "酒馆": "tavern_interior",
+    "仓库": "warehouse",
+    "森林小路": "forest_path_day"
+  },
+  "location_descriptions": {
+    "村口": "A small fantasy village entrance at dawn, wooden gate, mist, wary guard post, muddy path",
+    "酒馆": "Cozy medieval tavern interior, fireplace, wooden tables, dim lantern light, worried patrons",
+    "仓库": "Abandoned merchant warehouse, broken crates, dim light through dusty windows, suspicious footprints",
+    "森林小路": "Dark forest trail, twisted trees, fog, hidden bandit ambush atmosphere"
+  },
+  "npc_visual_hints": {
+    "托马斯": "middle-aged village guard, chainmail, spear, suspicious stern face",
+    "米拉": "tavern keeper woman, apron, worried kind eyes, fireplace background",
+    "艾琳娜": "young sad merchant daughter, simple dress, tearful eyes, tavern setting",
+    "瓦里克": "bandit leader, scarred face, dark leather armor, forest road, menacing grin"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "connections": {
+    "村口": ["酒馆", "仓库"],
+    "酒馆": ["村口", "仓库", "森林小路"],
+    "仓库": ["村口", "酒馆"],
+    "森林小路": ["酒馆"]
+  },
+  "locations": [
+    {
+      "name": "村口",
+      "description": "雨后灰白的村庄大门，火把未熄，泥泞路面",
+      "lighting": "雨后灰白晨光，火把未熄",
+      "soundscape": ["雨声", "村民低语", "远处钟声"],
+      "danger": "低",
+      "visual_tags": ["木栅", "火把", "石墙", "泥泞"],
+      "interactive_objects": ["公告板", "泥泞路面", "火把", "通往酒馆的小路", "通往仓库的小路"],
+      "player_position": "村口广场边缘",
+      "npc_positions": { "托马斯": "木栅栏旁", "艾琳娜": "广场中央" },
+      "visual": {
+        "entity_id": "loc:村口",
+        "description": "medieval village gate at rainy dawn, torches flickering, stone walls, muddy path"
+      }
+    },
+    {
+      "name": "酒馆",
+      "description": "中世纪酒馆，壁炉暖光与窗外冷色天光",
+      "lighting": "壁炉暖光与窗外冷色天光交错",
+      "soundscape": ["杯盏碰撞", "压低的人声", "炉火噼啪"],
+      "danger": "低",
+      "visual_tags": ["木桌", "酒桶", "壁炉"],
+      "interactive_objects": ["吧台", "酒桶", "楼梯", "后门", "通往村口的大门"],
+      "player_position": "酒馆门口内侧",
+      "npc_positions": { "米拉": "吧台后", "艾琳娜": "靠窗角落" },
+      "visual": {
+        "entity_id": "loc:酒馆",
+        "description": "cozy medieval tavern interior, wooden tables, fireplace, warm lantern light"
+      }
+    },
+    {
+      "name": "仓库",
+      "description": "阴暗的商人仓库，破损货箱与泥脚印",
+      "lighting": "高处小窗漏下的斜光，角落昏暗",
+      "soundscape": ["木板吱呀", "滴水", "远处风声"],
+      "danger": "中",
+      "visual_tags": ["货箱", "蛛网", "脚印"],
+      "interactive_objects": ["破损货箱", "麻袋堆", "带泥脚印", "侧门"],
+      "player_position": "仓库入口内侧",
+      "npc_positions": { "托马斯": "货箱通道尽头" },
+      "visual": {
+        "entity_id": "loc:仓库",
+        "description": "dark abandoned merchant warehouse, broken crates, cobwebs, dusty windows"
+      }
+    },
+    {
+      "name": "森林小路",
+      "description": "浓雾森林小径，折断树枝与车辙",
+      "lighting": "树冠遮天，雾色漫射光",
+      "soundscape": ["枝叶摩擦", "远处哨声", "脚步踩在落叶上"],
+      "danger": "高",
+      "visual_tags": ["雾", "枯树", "车辙", "血迹"],
+      "interactive_objects": ["折断树枝", "车辙", "血迹", "密林深处"],
+      "player_position": "小路中段",
+      "npc_positions": { "瓦里克": "路障后方" },
+      "visual": {
+        "entity_id": "loc:森林小路",
+        "description": "dark forest trail, twisted trees, fog, bandit ambush atmosphere"
+      }
+    }
+  ]
+}

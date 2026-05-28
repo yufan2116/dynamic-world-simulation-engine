@@ -1,0 +1,125 @@
+{
+  "connections": {
+    "山门遗迹": ["迷雾栈道", "断剑石林"],
+    "迷雾栈道": ["山门遗迹", "古井", "封印祭坛"],
+    "断剑石林": ["山门遗迹", "灵气裂隙"],
+    "古井": ["迷雾栈道", "地下剑冢"],
+    "封印祭坛": ["迷雾栈道", "灵气裂隙"],
+    "灵气裂隙": ["断剑石林", "封印祭坛", "地下剑冢"],
+    "地下剑冢": ["古井", "灵气裂隙"]
+  },
+  "locations": [
+    {
+      "name": "山门遗迹",
+      "description": "残破山门立于灵雾中，断裂符纹仍残留微光",
+      "lighting": "晨雾中的青白日光，符纹明灭",
+      "soundscape": ["远处钟鸣", "风声", "碎石滚落"],
+      "danger": "中",
+      "spiritual_pressure": 2,
+      "visual_tags": ["残破牌楼", "石阶", "符纹", "灵雾"],
+      "interactive_objects": ["断裂符纹", "石阶", "倒塌牌楼", "通往迷雾栈道", "通往断剑石林"],
+      "player_position": "石阶尽头平台",
+      "npc_positions": { "玄尘道人": "牌楼正中", "青岚": "石阶侧", "太虚宗弟子": "牌楼后" },
+      "visual": {
+        "entity_id": "loc:山门遗迹",
+        "description": "ruined xianxia mountain gate in mist, broken talisman pillars, faint cyan spiritual light, cliff edge"
+      }
+    },
+    {
+      "name": "断剑石林",
+      "description": "无数断剑插在石林，剑意未散",
+      "lighting": "雾中冷色漫射，剑身反光",
+      "soundscape": ["金属轻鸣", "风穿石缝", "脚步回声"],
+      "danger": "高",
+      "spiritual_pressure": 4,
+      "visual_tags": ["断剑", "石林", "剑意", "血迹"],
+      "interactive_objects": ["半截灵剑", "染血布条", "剑修遗骸", "通往山门", "通往灵气裂隙"],
+      "player_position": "石林通道入口",
+      "npc_positions": { "青岚": "断剑阵心", "黑衣散修": "石林阴影处" },
+      "visual": {
+        "entity_id": "loc:断剑石林",
+        "description": "field of broken ancient swords in stone forest, mist, xianxia forbidden land, ink-wash mountains"
+      }
+    },
+    {
+      "name": "封印祭坛",
+      "description": "古老祭坛符文碎裂，黑气自裂缝渗出",
+      "lighting": "幽绿灵光与暗紫邪气交错",
+      "soundscape": ["灵气嗡鸣", "锁链轻响", "低沉诵经残响"],
+      "danger": "极高",
+      "spiritual_pressure": 6,
+      "visual_tags": ["祭坛", "碎裂封印", "黑气", "古纹"],
+      "interactive_objects": ["碎裂阵眼", "镇魂石柱", "渗气裂缝", "通往迷雾栈道"],
+      "player_position": "祭坛外环",
+      "npc_positions": { "玄尘道人": "阵眼一侧", "镇守残魂": "祭坛中央虚影" },
+      "visual": {
+        "entity_id": "loc:封印祭坛",
+        "description": "ancient sealing altar, cracked golden runes, green and purple spiritual mist, ruined xianxia temple"
+      }
+    },
+    {
+      "name": "古井",
+      "description": "井口阴风阵阵，井壁刻满褪色剑诀",
+      "lighting": "井口天光与井下幽暗对比",
+      "soundscape": ["水滴", "井底回响", "微弱剑鸣"],
+      "danger": "高",
+      "spiritual_pressure": 5,
+      "visual_tags": ["古井", "剑诀刻痕", "阴风"],
+      "interactive_objects": ["井绳", "刻痕", "井底微光", "通往地下剑冢"],
+      "player_position": "井栏边",
+      "npc_positions": { "黑衣散修": "井对岸" },
+      "visual": {
+        "entity_id": "loc:古井",
+        "description": "ancient well on misty cliff, sword scripture carvings, ink painting style, eerie cyan glow from depth"
+      }
+    },
+    {
+      "name": "灵气裂隙",
+      "description": "地面裂开，紊乱灵气如刃溢出",
+      "lighting": "裂隙下涌出的青紫异光",
+      "soundscape": ["灵气撕裂声", "碎石坠落", "远处钟鸣"],
+      "danger": "极高",
+      "spiritual_pressure": 7,
+      "visual_tags": ["裂隙", "灵气乱流", "污染", "残阵"],
+      "interactive_objects": ["裂隙边缘", "漂浮灵石碎片", "残破阵旗", "通往断剑石林", "通往地下剑冢"],
+      "player_position": "裂隙安全距离外",
+      "npc_positions": { "太虚宗弟子": "裂隙旁打坐", "镇守残魂": "裂隙上方虚影" },
+      "visual": {
+        "entity_id": "loc:灵气裂隙",
+        "description": "spiritual energy rift in mountain ground, chaotic cyan purple light, broken formation flags, xianxia landscape"
+      }
+    },
+    {
+      "name": "迷雾栈道",
+      "description": "悬于崖壁的木栈道，雾中难辨五步之外",
+      "lighting": "浓雾散射的灰青光",
+      "soundscape": ["木板吱呀", "雾中鹤唳", "远处钟声"],
+      "danger": "中",
+      "spiritual_pressure": 3,
+      "visual_tags": ["栈道", "悬崖", "灵雾", "古藤"],
+      "interactive_objects": ["腐朽护栏", "刻字木桩", "通往山门", "通往古井", "通往封印祭坛"],
+      "player_position": "栈道中段",
+      "npc_positions": { "青岚": "栈道前端" },
+      "visual": {
+        "entity_id": "loc:迷雾栈道",
+        "description": "misty cliffside wooden walkway, ancient vines, flying sword silhouette in fog, Chinese ink painting"
+      }
+    },
+    {
+      "name": "地下剑冢",
+      "description": "地下洞窟剑冢，钟鸣自深处传来",
+      "lighting": "幽蓝剑光与金色古纹点缀黑暗",
+      "soundscape": ["钟鸣回响", "剑气低啸", "滴水"],
+      "danger": "极高",
+      "spiritual_pressure": 8,
+      "visual_tags": ["剑冢", "古殿", "残破阵法", "钟鸣"],
+      "interactive_objects": ["剑冢石碑", "残魂剑座", "通往古井", "通往灵气裂隙"],
+      "player_position": "剑冢入口石阶",
+      "npc_positions": { "镇守残魂": "剑冢深处", "黑衣散修": "侧道阴影" },
+      "visual": {
+        "entity_id": "loc:地下剑冢",
+        "description": "underground sword grave hall, ancient broken formation, cyan spiritual mist, golden runes, xianxia storybook"
+      }
+    }
+  ]
+}

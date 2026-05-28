@@ -1,0 +1,15 @@
+{
+  "id": "medieval_dark_fantasy",
+  "tone": ["grounded dark fantasy", "muddy realism", "investigation tone"],
+  "style_hints": "写实泥地质感；短句；关注可见细节（火把、泥印、伤口）；调查口吻；禁止命运/史诗/宿命修辞。",
+  "encounter_tone": "压抑但克制",
+  "llm_extra_rules": [
+    "使用具体可见物：泥、火把、木栅、雨痕",
+    "NPC 对白短、带地方口音感即可，勿文艺腔",
+    "保持 CRPG 场景渲染：当前动作、当前 tension、当前 NPC 反应"
+  ],
+  "novel_avoid": ["命运", "宿命", "灵魂", "史诗", "世界的齿轮"],
+  "default_rumor": "黑森林方向最近常有商队失踪，雾中似有东西游荡。",
+  "prologue_html": "<p class=\"chapter-epigraph\">序 · 雾中的雷文福德</p>\n<p><em>马蹄踏过泥泞时，雨已经停了，但天空仍像一块拧不干的旧布。</em></p>\n<p>你从北境一路南下，马鞍上磨出细密的裂口，斗篷下摆带着烟火与铁锈的气味。人们需要故事来解释恐惧，而你靠<strong>故事之外的真相</strong>换一口饭吃。</p>\n<p><strong>{player_name}</strong>——曾经的北境侦察兵，如今的流浪{player_class}。袖中藏着：{equipment}。那枚褪色军徽贴着心口，像一块尚未冷却的铁。</p>\n<p>雷文福德本该只是旅途中的又一处驿站。可当你勒马停住，雾却在缓慢后退：先是树梢，再是歪斜的招牌，最后是村口石墙上斑驳的纹章。</p>\n<p>你听见远处钟声忽然乱了节奏。风里有人声、马蹄、少女压抑的哭喊——都还模糊，像隔着一层未干的水彩。</p>\n<p class=\"dialogue\"><em>（雾淡了。村口的轮廓终于稳定下来。）</em></p>",
+  "opening_html": "<p class=\"chapter-epigraph\">{chapter_title}</p>\n<p>雾散了。雷文福德村口就在眼前：木栅、火把、守卫<strong>托马斯</strong>紧皱的眉头，都在晨光里变得清晰而坚硬。</p>\n<p>广场中央，<strong>艾琳娜</strong>裙摆沾泥，声音发颤：</p>\n<p class=\"dialogue\">「求求你们……我父亲昨晚没有回来！他是商人马库斯——」</p>\n<p>托马斯手按剑柄，目光落在你身上。酒馆方向的灯火在风里摇晃，老板娘<strong>米拉</strong>站在门帘后，神色惊忧。</p>\n<p><em>村民的窃窃私语、森林深处的沉默——这个世界不会等你准备好。而现在，它已为你敞开。</em></p>"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "medieval_dark_fantasy",
+  "name": "失踪商人（中世纪奇幻）",
+  "world_name": "Ravenford",
+  "village_name": "Ravenford",
+  "chapter_title": "失踪的商人",
+  "background": "边境村庄雷文福德。昨夜商人马库斯前往仓库后失踪，恐慌在村民中蔓延。",
+  "default_location": "村口",
+  "day": 1,
+  "time_of_day": "清晨",
+  "weather": "暴雨初歇",
+  "world_minutes": 480,
+  "clock": "08:00",
+  "village_panic": 35,
+  "danger_level": "中",
+  "war_risk": 25,
+  "opening_scene": true,
+  "scene_npcs": ["托马斯", "艾琳娜"],
+  "player": {
+    "name": "凯尔",
+    "class_name": "骑士",
+    "background": "北境战争侦察兵，战后以调查委托为生",
+    "strength": 14,
+    "dexterity": 15,
+    "constitution": 13,
+    "intelligence": 12,
+    "wisdom": 13,
+    "charisma": 11,
+    "equipment": ["短剑", "旧皮甲", "调查笔记", "褪色军徽"]
+  },
+  "quests": [
+    {
+      "id": "missing_merchant",
+      "title": "失踪商人的调查",
+      "description": "商人马库斯昨夜未归，女儿艾琳娜请求你查明真相。",
+      "status": "active",
+      "objectives": [
+        "在村口向守卫托马斯了解情况",
+        "到酒馆询问米拉与艾琳娜",
+        "搜查仓库寻找线索",
+        "沿森林小路追踪可疑踪迹"
+      ]
+    }
+  ]
+}

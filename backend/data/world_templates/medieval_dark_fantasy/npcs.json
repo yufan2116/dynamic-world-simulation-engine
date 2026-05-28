@@ -1,0 +1,80 @@
+{
+  "npcs": [
+    {
+      "name": "托马斯",
+      "location": "村口",
+      "attitude": "怀疑",
+      "attitude_value": -10,
+      "present": true,
+      "role": "guard",
+      "personality": "警惕、疲惫、责任感强；说话短句、公事公办",
+      "goal": "维持村口秩序，查清陌生人身份",
+      "fear": "强盗再度袭击村庄",
+      "current_emotion": "警惕",
+      "current_action": "手按剑柄扫视广场，盘问过往行人",
+      "memories": ["守卫托马斯在村口执勤，对陌生人保持警惕。"],
+      "visual": {
+        "entity_id": "npc:托马斯",
+        "role": "guard",
+        "description": "middle-aged male town guard, chainmail, holding spear, suspicious stern expression"
+      }
+    },
+    {
+      "name": "米拉",
+      "location": "酒馆",
+      "attitude": "担忧",
+      "attitude_value": 20,
+      "present": true,
+      "role": "innkeeper",
+      "personality": "务实善良；说话直接、带关切",
+      "goal": "保住酒馆生意，弄清失踪传闻",
+      "fear": "恐慌吓跑旅客",
+      "current_emotion": "忧虑",
+      "current_action": "擦拭吧台，低声与常客交换消息",
+      "memories": ["米拉是酒馆老板，最近生意因商人失踪而冷清。"],
+      "visual": {
+        "entity_id": "npc:米拉",
+        "role": "innkeeper",
+        "description": "warm middle-aged female innkeeper, apron, worried kind eyes, tavern setting"
+      }
+    },
+    {
+      "name": "艾琳娜",
+      "location": "村口",
+      "attitude": "悲伤",
+      "attitude_value": 30,
+      "present": true,
+      "role": "merchant daughter",
+      "personality": "坚韧但悲伤；说话急促、带恳求",
+      "goal": "找到父亲马库斯",
+      "fear": "父亲已遭遇不测",
+      "current_emotion": "焦急",
+      "current_action": "攥着裙摆向路人哭诉，目光不断望向仓库方向",
+      "memories": ["艾琳娜在村口向路人哭诉，父亲马库斯昨夜未归。"],
+      "visual": {
+        "entity_id": "npc:艾琳娜",
+        "role": "merchant daughter",
+        "description": "young sad woman, simple dress, tearful eyes, merchant's daughter"
+      }
+    },
+    {
+      "name": "瓦里克",
+      "location": "森林小路",
+      "attitude": "敌对",
+      "attitude_value": -60,
+      "present": false,
+      "role": "bandit leader",
+      "personality": "残忍狡诈；说话嘲弄、威胁",
+      "goal": "控制商路，勒索或劫掠",
+      "fear": "村庄联合清剿",
+      "current_emotion": "戒备",
+      "current_action": "在雾中布置路障，监视仓库方向的动静",
+      "memories": ["强盗首领瓦里克盘踞在森林小路，手下最近活动频繁。"],
+      "visual": {
+        "entity_id": "npc:瓦里克",
+        "role": "bandit leader",
+        "description": "rugged male bandit leader, scarred face, leather armor, axe, menacing"
+      }
+    }
+  ]
+}

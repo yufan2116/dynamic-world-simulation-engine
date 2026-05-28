@@ -1,0 +1,44 @@
+{
+  "id": "xianxia_forbidden_land",
+  "name": "修仙禁地（仙侠）",
+  "world_name": "葬仙渊",
+  "chapter_title": "禁地之门",
+  "background": "古老禁地葬仙渊。结界不稳，宗门弟子接连失踪，灵气污染附近山脉，深处偶有钟鸣。",
+  "default_location": "山门遗迹",
+  "day": 1,
+  "time_of_day": "清晨",
+  "weather": "灵雾弥漫",
+  "world_minutes": 360,
+  "clock": "06:00",
+  "tension": 55,
+  "danger_level": "高",
+  "war_risk": 40,
+  "opening_scene": true,
+  "scene_npcs": ["青岚", "玄尘道人"],
+  "player": {
+    "name": "韩尘",
+    "class_name": "散修",
+    "background": "无门无派的散修，为寻机缘误入葬仙渊禁地",
+    "strength": 13,
+    "dexterity": 16,
+    "constitution": 12,
+    "intelligence": 11,
+    "wisdom": 14,
+    "charisma": 10,
+    "equipment": ["青锋剑", "破障符", "疗伤丹", "禁地残图"]
+  },
+  "quests": [
+    {
+      "id": "forbidden_abyss",
+      "title": "葬仙渊禁地",
+      "description": "禁地结界不稳，需查明弟子失踪与灵气污染之源。",
+      "status": "active",
+      "objectives": [
+        "在山门遗迹向玄尘道人打听结界异变",
+        "于断剑石林寻找失踪弟子线索",
+        "探查封印祭坛与灵气裂隙",
+        "循钟鸣深入地下剑冢"
+      ]
+    }
+  ]
+}

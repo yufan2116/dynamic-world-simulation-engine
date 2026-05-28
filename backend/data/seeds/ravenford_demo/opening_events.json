@@ -1,0 +1,19 @@
+{
+  "description": "仅用于开局事件日志与演示说明，不锁定后续剧情。",
+  "events": [
+    {
+      "event_type": "world_change",
+      "payload": {
+        "seed_bootstrap": true,
+        "summary": "【世界】雷文福德：商人马库斯失踪，村庄处于不安的清晨。"
+      }
+    },
+    {
+      "event_type": "world_change",
+      "payload": {
+        "seed_bootstrap": true,
+        "summary": "【传闻】酒馆与村口已开始流传仓库方向的议论。"
+      }
+    }
+  ]
+}

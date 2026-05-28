@@ -1,0 +1,24 @@
+{
+  "base_style": "Chinese xianxia picture-book illustration, ink wash mountains, rice paper texture, soft cel shading, cyan spiritual light, golden ancient runes, non-photorealistic",
+  "prompt_suffix": "国风绘本水墨仙侠，宣纸纹理，水墨边缘，青绿灵气，金色古纹，山水意境，修仙绘本，柔和线条，古风手游立绘感",
+  "guardrail": "Chinese ink-wash xianxia storybook illustration, rice paper texture, soft watercolor edges, cyan-green spiritual aura, golden ancient patterns, mountain mist atmosphere, hand-drawn, gentle lines, slightly chibi-proportioned characters acceptable, absolutely NOT photorealistic, NOT 3D render, NOT western fantasy, no text, no watermark",
+  "banner_motifs": ["cliff temple", "flying sword silhouette", "spiritual mist", "broken formation", "ancient hall"],
+  "player_portrait_roles": {
+    "散修": { "role": "rogue cultivator", "description": "wandering male cultivator, worn cloak, sharp gaze, faint flying sword, ink storybook portrait" },
+    "剑修": { "role": "sword cultivator", "description": "young male sword cultivator, simple robes, flying sword hint, ink wash portrait" },
+    "丹师": { "role": "alchemist", "description": "calm female alchemist, medicine gourd, herb mist, soft storybook lines" }
+  },
+  "ui_theme": {
+    "id": "xianxia",
+    "accent": "#4a9e7f",
+    "gold": "#c4a35a",
+    "bg": "#0a1210",
+    "panel": "#121c18",
+    "border": "#2d4a3e",
+    "text": "#e0ebe6",
+    "muted": "#8aa396",
+    "fontFamily": "\"Noto Serif SC\", \"Source Han Serif SC\", Georgia, serif",
+    "panelTexture": "rice-paper",
+    "atmosphere": "cyan ink xianxia"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "note": "模板数据已迁移至 data/world_templates/<id>/；此文件仅作兼容说明。",
+  "templates": [
+    { "id": "medieval_dark_fantasy", "folder": "medieval_dark_fantasy" },
+    { "id": "xianxia_forbidden_land", "folder": "xianxia_forbidden_land" }
+  ]
+}

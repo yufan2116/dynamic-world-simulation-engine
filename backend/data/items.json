@@ -1,0 +1,8 @@
+{
+  "items": [
+    {"id": "shortsword", "name": "短剑", "type": "weapon", "damage": "1d6"},
+    {"id": "leather", "name": "皮甲", "type": "armor", "ac_bonus": 1},
+    {"id": "torch", "name": "火把", "type": "gear"},
+    {"id": "notes", "name": "调查笔记", "type": "quest"}
+  ]
+}
