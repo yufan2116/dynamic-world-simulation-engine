@@ -3,6 +3,8 @@ import type { SceneNpc } from "../lib/sceneData";
 
 interface Props {
   item: SceneNpc;
+  /** 横向紧凑条：保留立绘，不占满纵向空间 */
+  compact?: boolean;
 }
 
 function attitudeColor(attitude: string): string {
@@ -13,16 +15,45 @@ function attitudeColor(attitude: string): string {
   return "text-fantasy-muted";
 }
 
-export default function NpcSceneCard({ item }: Props) {
+export default function NpcSceneCard({ item, compact = false }: Props) {
   const { npc, portraitUrl, faction, role, pressure, trustLabel } = item;
   const moodLine =
     npc.memories.length > 0
       ? npc.memories[npc.memories.length - 1]
       : moodFallback(npc.attitude, npc.name);
 
+  if (compact) {
+    return (
+      <figure
+        className="npc-stage-card-compact shrink-0 w-[100px] snap-start"
+        title={`${role} · ${npc.attitude} · ${moodLine}`}
+      >
+        <div className="relative w-full h-[92px] rounded-md overflow-hidden border border-fantasy-gold/35 shadow-md bg-black/60">
+          {portraitUrl ? (
+            <CachedImage
+              src={portraitUrl}
+              alt={npc.name}
+              className="w-full h-full object-cover object-[50%_12%] scale-[1.06]"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-fantasy-muted text-[10px]">
+              …
+            </div>
+          )}
+          <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/75 to-transparent px-1.5 pt-4 pb-1 text-center leading-tight">
+            <p className="font-fantasy text-fantasy-gold text-[11px] leading-none truncate w-full">
+              {npc.name}
+            </p>
+            <p className={`text-[9px] truncate ${attitudeColor(npc.attitude)}`}>{npc.attitude}</p>
+          </figcaption>
+        </div>
+      </figure>
+    );
+  }
+
   return (
-    <figure className="npc-stage-card shrink-0 w-[128px] sm:w-[148px] flex flex-col items-center">
-      <div className="relative w-full aspect-[3/4] h-[200px] sm:h-[220px] rounded-lg overflow-hidden border-2 border-fantasy-gold/30 shadow-lg shadow-black/60 bg-gradient-to-b from-fantasy-panel/30 to-black/80">
+    <figure className="npc-stage-card shrink-0 w-[120px] sm:w-[136px] flex flex-col items-center">
+      <div className="relative w-full aspect-[3/4] h-[168px] sm:h-[188px] rounded-lg overflow-hidden border-2 border-fantasy-gold/30 shadow-lg shadow-black/60 bg-gradient-to-b from-fantasy-panel/30 to-black/80">
         {portraitUrl ? (
           <CachedImage
             src={portraitUrl}

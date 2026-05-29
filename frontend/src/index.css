@@ -79,6 +79,146 @@ body {
   font-size: 0.85rem;
 }
 
+.story-content .chapter-ending {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--theme-border);
+}
+
+.story-content .ending-title {
+  font-family: Georgia, serif;
+  color: var(--theme-gold);
+  font-size: 1.35rem;
+  margin: 0.5rem 0;
+}
+
+.story-content .ending-subtitle {
+  color: var(--theme-muted);
+  margin-bottom: 1rem;
+}
+
+/* CRPG 日志感：世界/氛围句用方括号，无系统色块 */
+.story-content p.world,
+.narr-beat-natural p.world {
+  color: #a89880;
+  font-style: italic;
+  margin: 0.75rem 0;
+  padding-left: 0.25rem;
+}
+
+.story-content p.scene {
+  margin: 0.65rem 0;
+  line-height: 1.65;
+}
+
+.story-content p.result,
+.story-content p.dialogue {
+  margin: 0.5rem 0;
+}
+
+.story-content p.player-note {
+  color: #b8a888;
+  font-style: italic;
+  margin: 0.65rem 0;
+  padding-left: 0.5rem;
+  border-left: 2px solid rgba(201, 162, 39, 0.35);
+}
+
+.story-content p.thought {
+  color: #c4b8a8;
+  font-style: italic;
+  margin: 0.75rem 0;
+}
+
+.story-content p.clue-acquired,
+.story-content p.clue-confirm {
+  color: var(--theme-gold);
+  font-size: 0.92em;
+  margin: 0.85rem 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.story-content .dice-check {
+  margin: 0.75rem 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.story-content .dice-check-title {
+  color: var(--theme-gold);
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.story-content .dice-check-roll,
+.story-content .dice-check-outcome {
+  margin: 0.15rem 0;
+  font-size: 0.92em;
+  color: #d4ccc0;
+}
+
+.story-content .investigation-journal {
+  margin: 1.25rem 0 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(123, 94, 167, 0.4);
+  border-radius: 0.5rem;
+  background: rgba(26, 24, 36, 0.6);
+}
+
+.story-content .journal-title {
+  color: #b8a0d8;
+  font-size: 0.88em;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.story-content .journal-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #d4ccc0;
+}
+
+.story-content .journal-list li {
+  margin: 0.15rem 0;
+}
+
+@keyframes storyEntryHighlight {
+  0% {
+    background-color: rgba(201, 162, 39, 0.22);
+    border-color: rgba(201, 162, 39, 0.65);
+    box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.35);
+  }
+  70% {
+    background-color: rgba(201, 162, 39, 0.1);
+    border-color: rgba(201, 162, 39, 0.4);
+  }
+  100% {
+    background-color: rgba(201, 162, 39, 0.02);
+    border-color: rgba(201, 162, 39, 0.15);
+    box-shadow: none;
+  }
+}
+
+.narrative-feed .narr-entry-latest-highlight {
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+  animation: storyEntryHighlight 1.5s ease-out forwards;
+}
+
+.story-content p.player-action {
+  color: #c4b8a8;
+  font-size: 0.92em;
+  margin: 0.85rem 0 0.5rem;
+}
+
 .story-content .opening-prose em {
   display: block;
   margin: 1rem 0;
@@ -204,21 +344,13 @@ body {
 }
 
 .narr-beat-result {
-  background: rgba(80, 100, 140, 0.12);
-  border-color: rgba(100, 130, 180, 0.45);
-}
-
-.narr-beat-result .narr-beat-label {
-  color: #8eb4d4;
+  background: transparent;
+  border: none;
 }
 
 .narr-beat-consequence {
-  background: rgba(52, 90, 70, 0.1);
-  border-color: rgba(72, 140, 100, 0.35);
-}
-
-.narr-beat-consequence .narr-beat-label {
-  color: #7dbd96;
+  background: transparent;
+  border: none;
 }
 
 .narr-beat-npc,
@@ -233,12 +365,10 @@ body {
 }
 
 .narr-beat-world {
-  background: rgba(201, 162, 39, 0.08);
-  border-color: rgba(201, 162, 39, 0.35);
-}
-
-.narr-beat-world .narr-beat-label {
-  color: #c9a227;
+  background: transparent;
+  border: none;
+  font-style: italic;
+  color: #a89880;
 }
 
 .narr-beat-perception {

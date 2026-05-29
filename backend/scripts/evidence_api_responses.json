@@ -1,0 +1,680 @@
+[
+  {
+    "scenario": "opening_after_start",
+    "turn": 1,
+    "player_knowledge": {
+      "facts": [
+        {
+          "id": "pf_location_village_gate",
+          "text": "当前地点：雷文福德村口",
+          "source": "narrative_opening",
+          "type": "location"
+        },
+        {
+          "id": "pf_elena_help",
+          "text": "艾琳娜公开求助：父亲马库斯昨晚未归。",
+          "source": "npc_statement",
+          "type": "npc_statement"
+        }
+      ],
+      "rumors": [],
+      "observations": [
+        {
+          "id": "pf_thomas_guarding",
+          "text": "托马斯在村口警戒，手按剑柄。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_mira_observing",
+          "text": "米拉站在酒馆门帘后观察，神色惊忧。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_gate_env",
+          "text": "村口环境：木栅、火把、泥泞广场、酒馆方向灯火。",
+          "source": "narrative_opening",
+          "type": "environment"
+        }
+      ],
+      "questions": [],
+      "available_followups": []
+    },
+    "parsed_intent": null,
+    "actions": [
+      {
+        "id": "inspect_村口_environment",
+        "label": "仔细观察村口周围的环境",
+        "category": "investigate",
+        "source_fact": "scene:村口",
+        "reason": "你当前在村口，可观察周围环境",
+        "intent": {
+          "action_type": "investigate",
+          "target": "environment",
+          "location": "current"
+        }
+      },
+      {
+        "id": "observe_mira_at_tavern",
+        "label": "走向酒馆门口，观察米拉刚才在门帘后看到了什么",
+        "category": "investigate",
+        "source_fact": "pf_mira_observing",
+        "reason": "开场已注意到米拉在门帘后观察",
+        "intent": {
+          "action_type": "observe",
+          "target": "mira",
+          "location": "tavern",
+          "fact_id": "pf_mira_observing"
+        }
+      },
+      {
+        "id": "follow_pf_thomas_guarding",
+        "label": "针对「托马斯在村口警戒，手按剑柄。」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_thomas_guarding",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_thomas_guarding"
+        }
+      },
+      {
+        "id": "follow_pf_gate_env",
+        "label": "针对「村口环境：木栅、火把、泥泞广场、酒馆方向灯火…」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_gate_env",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_gate_env"
+        }
+      },
+      {
+        "id": "ask_elena_father_details",
+        "label": "上前安慰冲进广场的艾琳娜，询问细节",
+        "category": "social",
+        "source_fact": "pf_elena_help",
+        "reason": "艾琳娜正在广场求助",
+        "intent": {
+          "action_type": "talk",
+          "target": "艾琳娜",
+          "location": "current",
+          "topic": "父亲失踪"
+        }
+      },
+      {
+        "id": "ask_thomas_last_night",
+        "label": "询问托马斯昨夜是否听见异常动静",
+        "category": "social",
+        "source_fact": "scene:村口",
+        "reason": "托马斯在场，可交谈",
+        "intent": {
+          "action_type": "talk",
+          "target": "托马斯",
+          "location": "current",
+          "topic": "询问托马斯昨夜异常情况"
+        }
+      },
+      {
+        "id": "move_村口_仓库",
+        "label": "冒雨赶往村口外侧",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往仓库",
+        "intent": {}
+      },
+      {
+        "id": "move_村口_酒馆",
+        "label": "冒雨赶往酒馆",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往酒馆",
+        "intent": {}
+      },
+      {
+        "id": "rest",
+        "label": "在原地休整，恢复体力",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "seek_shelter",
+        "label": "寻找可避雨的遮蔽处等待天气好转",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "scout_perimeter",
+        "label": "沿村界巡逻一圈，标记异常",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "free_input",
+        "label": "自由描述你想做的事…",
+        "category": "free",
+        "source_fact": "",
+        "reason": "",
+        "intent": {}
+      }
+    ],
+    "inline_choices_count": 6,
+    "narrative_plain_preview": "<p class=\"chapter-epigraph\">失踪的商人</p>\n<p>雾散了。雷文福德村口就在眼前：木栅、火把、守卫<strong>托马斯</strong>紧皱的眉头，都在晨光里变得清晰而坚硬。</p>\n<p>广场中央，<strong>艾琳娜</strong>裙摆沾泥，声音发颤：</p>\n<p class=\"dialogue\">「求求你们……我父亲昨晚没有回来！他是商人马库斯——」</p>\n<p>托马斯手按剑柄，目光落在你身上。酒馆方向的灯火在风里摇晃，老板娘<strong>米拉</strong>站在门帘后，神色惊忧。</p>\n<p><em>村民的窃窃私语、森林深处的沉默——这个世界不会等你准备好。而现在，它已为你敞开。</em></p>"
+  },
+  {
+    "scenario": "after_observe_mira_failure_simulated",
+    "resolver_consequence": "需要换个角度再观察。",
+    "player_knowledge": {
+      "facts": [
+        {
+          "id": "pf_location_village_gate",
+          "text": "当前地点：雷文福德村口",
+          "source": "narrative_opening",
+          "type": "location"
+        },
+        {
+          "id": "pf_elena_help",
+          "text": "艾琳娜公开求助：父亲马库斯昨晚未归。",
+          "source": "npc_statement",
+          "type": "npc_statement"
+        }
+      ],
+      "rumors": [],
+      "observations": [
+        {
+          "id": "pf_thomas_guarding",
+          "text": "托马斯在村口警戒，手按剑柄。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_mira_observing",
+          "text": "米拉站在酒馆门帘后观察，神色惊忧。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_gate_env",
+          "text": "村口环境：木栅、火把、泥泞广场、酒馆方向灯火。",
+          "source": "narrative_opening",
+          "type": "environment"
+        },
+        {
+          "id": "mira_behind_tavern_curtain_unclear",
+          "text": "米拉似乎仍在门帘后停留，但你没看清她在看什么",
+          "source": "player_observation"
+        }
+      ],
+      "questions": [],
+      "available_followups": [
+        {
+          "id": "change_angle_observe_mira",
+          "label": "换个角度观察酒馆门帘后的米拉",
+          "source_fact": "mira_behind_tavern_curtain_unclear",
+          "reason": "上一轮观察未能看清门帘后的情况",
+          "category": "investigate",
+          "intent": {
+            "action_type": "observe",
+            "target": "mira",
+            "location": "tavern",
+            "fact_id": "mira_behind_tavern_curtain_unclear"
+          }
+        },
+        {
+          "id": "approach_tavern_ask_mira",
+          "label": "走近酒馆门口，直接询问米拉刚才看到了什么",
+          "source_fact": "mira_behind_tavern_curtain_unclear",
+          "reason": "观察未果，可改为当面询问",
+          "category": "social",
+          "intent": {
+            "action_type": "talk",
+            "target": "米拉",
+            "location": "tavern",
+            "fact_id": "mira_behind_tavern_curtain_unclear"
+          }
+        }
+      ]
+    },
+    "actions": [
+      {
+        "id": "inspect_村口_environment",
+        "label": "仔细观察村口周围的环境",
+        "category": "investigate",
+        "source_fact": "scene:村口",
+        "reason": "你当前在村口，可观察周围环境",
+        "intent": {
+          "action_type": "investigate",
+          "target": "environment",
+          "location": "current"
+        }
+      },
+      {
+        "id": "change_angle_observe_mira",
+        "label": "换个角度观察酒馆门帘后的米拉",
+        "category": "investigate",
+        "source_fact": "mira_behind_tavern_curtain_unclear",
+        "reason": "上一轮观察未能看清门帘后的情况",
+        "intent": {
+          "action_type": "observe",
+          "target": "mira",
+          "location": "tavern",
+          "fact_id": "mira_behind_tavern_curtain_unclear"
+        }
+      },
+      {
+        "id": "observe_mira_at_tavern",
+        "label": "走向酒馆门口，观察米拉刚才在门帘后看到了什么",
+        "category": "investigate",
+        "source_fact": "pf_mira_observing",
+        "reason": "开场已注意到米拉在门帘后观察",
+        "intent": {
+          "action_type": "observe",
+          "target": "mira",
+          "location": "tavern",
+          "fact_id": "pf_mira_observing"
+        }
+      },
+      {
+        "id": "follow_pf_thomas_guarding",
+        "label": "针对「托马斯在村口警戒，手按剑柄。」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_thomas_guarding",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_thomas_guarding"
+        }
+      },
+      {
+        "id": "follow_pf_gate_env",
+        "label": "针对「村口环境：木栅、火把、泥泞广场、酒馆方向灯火…」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_gate_env",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_gate_env"
+        }
+      },
+      {
+        "id": "ask_elena_father_details",
+        "label": "上前安慰冲进广场的艾琳娜，询问细节",
+        "category": "social",
+        "source_fact": "pf_elena_help",
+        "reason": "艾琳娜正在广场求助",
+        "intent": {
+          "action_type": "talk",
+          "target": "艾琳娜",
+          "location": "current",
+          "topic": "父亲失踪"
+        }
+      },
+      {
+        "id": "ask_thomas_last_night",
+        "label": "询问托马斯昨夜是否听见异常动静",
+        "category": "social",
+        "source_fact": "scene:村口",
+        "reason": "托马斯在场，可交谈",
+        "intent": {
+          "action_type": "talk",
+          "target": "托马斯",
+          "location": "current",
+          "topic": "询问托马斯昨夜异常情况"
+        }
+      },
+      {
+        "id": "approach_tavern_ask_mira",
+        "label": "走近酒馆门口，直接询问米拉刚才看到了什么",
+        "category": "social",
+        "source_fact": "mira_behind_tavern_curtain_unclear",
+        "reason": "观察未果，可改为当面询问",
+        "intent": {
+          "action_type": "talk",
+          "target": "米拉",
+          "location": "tavern",
+          "fact_id": "mira_behind_tavern_curtain_unclear"
+        }
+      },
+      {
+        "id": "move_村口_仓库",
+        "label": "冒雨赶往村口外侧",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往仓库",
+        "intent": {}
+      },
+      {
+        "id": "move_村口_酒馆",
+        "label": "冒雨赶往酒馆",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往酒馆",
+        "intent": {}
+      },
+      {
+        "id": "rest",
+        "label": "在原地休整，恢复体力",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "seek_shelter",
+        "label": "寻找可避雨的遮蔽处等待天气好转",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "scout_perimeter",
+        "label": "沿村界巡逻一圈，标记异常",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "free_input",
+        "label": "自由描述你想做的事…",
+        "category": "free",
+        "source_fact": "",
+        "reason": "",
+        "intent": {}
+      }
+    ]
+  },
+  {
+    "scenario": "after_talk_thomas",
+    "turn": 2,
+    "player_knowledge": {
+      "facts": [
+        {
+          "id": "pf_location_village_gate",
+          "text": "当前地点：雷文福德村口",
+          "source": "narrative_opening",
+          "type": "location"
+        },
+        {
+          "id": "pf_elena_help",
+          "text": "艾琳娜公开求助：父亲马库斯昨晚未归。",
+          "source": "npc_statement",
+          "type": "npc_statement"
+        }
+      ],
+      "rumors": [
+        {
+          "id": "demo_r1",
+          "text": "黑森林方向最近常有商队失踪，雾中似有东西游荡。",
+          "source": "低声交谈的村民",
+          "source_type": "overheard_conversation",
+          "source_label": "低声交谈的村民"
+        },
+        {
+          "id": "demo_r2",
+          "text": "有人看见马库斯昨夜往仓库方向去，再也没回来。",
+          "source": "低声交谈的村民",
+          "source_type": "overheard_conversation",
+          "source_label": "低声交谈的村民"
+        },
+        {
+          "id": "0e52b6b5",
+          "text": "艾琳娜哭喊：父亲昨晚没有回来。",
+          "source": "艾琳娜",
+          "source_type": "npc",
+          "source_label": "艾琳娜"
+        },
+        {
+          "id": "236993db",
+          "text": "地面出现新的凌乱痕迹，似乎有人匆忙经过。",
+          "source": "现场线索",
+          "source_type": "event",
+          "source_label": "现场线索"
+        }
+      ],
+      "observations": [
+        {
+          "id": "pf_thomas_guarding",
+          "text": "托马斯在村口警戒，手按剑柄。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_mira_observing",
+          "text": "米拉站在酒馆门帘后观察，神色惊忧。",
+          "source": "player_observation",
+          "type": "observation"
+        },
+        {
+          "id": "pf_gate_env",
+          "text": "村口环境：木栅、火把、泥泞广场、酒馆方向灯火。",
+          "source": "narrative_opening",
+          "type": "environment"
+        },
+        {
+          "id": "mira_behind_tavern_curtain_unclear",
+          "text": "米拉似乎仍在门帘后停留，但你没看清她在看什么",
+          "source": "player_observation"
+        }
+      ],
+      "questions": [],
+      "available_followups": [
+        {
+          "id": "change_angle_observe_mira",
+          "label": "换个角度观察酒馆门帘后的米拉",
+          "source_fact": "mira_behind_tavern_curtain_unclear",
+          "reason": "上一轮观察未能看清门帘后的情况",
+          "category": "investigate",
+          "intent": {
+            "action_type": "observe",
+            "target": "mira",
+            "location": "tavern",
+            "fact_id": "mira_behind_tavern_curtain_unclear"
+          }
+        },
+        {
+          "id": "approach_tavern_ask_mira",
+          "label": "走近酒馆门口，直接询问米拉刚才看到了什么",
+          "source_fact": "mira_behind_tavern_curtain_unclear",
+          "reason": "观察未果，可改为当面询问",
+          "category": "social",
+          "intent": {
+            "action_type": "talk",
+            "target": "米拉",
+            "location": "tavern",
+            "fact_id": "mira_behind_tavern_curtain_unclear"
+          }
+        }
+      ]
+    },
+    "parsed_intent": {
+      "action_type": "talk",
+      "target": "托马斯",
+      "destination": null,
+      "ability": "WIS",
+      "dc": 12,
+      "requires_roll": true,
+      "raw_input": "询问托马斯昨夜是否听见异常动静",
+      "parse_source": "selected_action",
+      "confidence": 0.95
+    },
+    "actions": [
+      {
+        "id": "inspect_村口_environment",
+        "label": "仔细观察村口周围的环境",
+        "category": "investigate",
+        "source_fact": "scene:村口",
+        "reason": "你当前在村口，可观察周围环境",
+        "intent": {
+          "action_type": "investigate",
+          "target": "environment",
+          "location": "current"
+        }
+      },
+      {
+        "id": "change_angle_observe_mira",
+        "label": "换个角度观察酒馆门帘后的米拉",
+        "category": "investigate",
+        "source_fact": "mira_behind_tavern_curtain_unclear",
+        "reason": "上一轮观察未能看清门帘后的情况",
+        "intent": {
+          "action_type": "observe",
+          "target": "mira",
+          "location": "tavern",
+          "fact_id": "mira_behind_tavern_curtain_unclear"
+        }
+      },
+      {
+        "id": "observe_mira_at_tavern",
+        "label": "走向酒馆门口，观察米拉刚才在门帘后看到了什么",
+        "category": "investigate",
+        "source_fact": "pf_mira_observing",
+        "reason": "开场已注意到米拉在门帘后观察",
+        "intent": {
+          "action_type": "observe",
+          "target": "mira",
+          "location": "tavern",
+          "fact_id": "pf_mira_observing"
+        }
+      },
+      {
+        "id": "follow_pf_thomas_guarding",
+        "label": "针对「托马斯在村口警戒，手按剑柄。」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_thomas_guarding",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_thomas_guarding"
+        }
+      },
+      {
+        "id": "follow_pf_gate_env",
+        "label": "针对「村口环境：木栅、火把、泥泞广场、酒馆方向灯火…」继续调查",
+        "category": "investigate",
+        "source_fact": "pf_gate_env",
+        "reason": "基于你已确认的现场观察",
+        "intent": {
+          "action_type": "investigate",
+          "target": "player_observation",
+          "fact_id": "pf_gate_env"
+        }
+      },
+      {
+        "id": "ask_elena_father_details",
+        "label": "友好地安慰艾琳娜，询问她父亲失踪的细节",
+        "category": "social",
+        "source_fact": "scene:村口",
+        "reason": "艾琳娜在场，可交谈",
+        "intent": {
+          "action_type": "talk",
+          "target": "艾琳娜",
+          "location": "current",
+          "topic": "安慰艾琳娜并询问商人失踪的细节"
+        }
+      },
+      {
+        "id": "rumor_0e52b6b5",
+        "label": "询问艾琳娜：艾琳娜哭喊：父亲昨晚没有回来。",
+        "category": "social",
+        "source_fact": "0e52b6b5",
+        "reason": "你已听说：艾琳娜哭喊：父亲昨晚没有回来。",
+        "intent": {
+          "action_type": "talk",
+          "target": "艾琳娜",
+          "location": "current",
+          "rumor_id": "0e52b6b5"
+        }
+      },
+      {
+        "id": "approach_tavern_ask_mira",
+        "label": "走近酒馆门口，直接询问米拉刚才看到了什么",
+        "category": "social",
+        "source_fact": "mira_behind_tavern_curtain_unclear",
+        "reason": "观察未果，可改为当面询问",
+        "intent": {
+          "action_type": "talk",
+          "target": "米拉",
+          "location": "tavern",
+          "fact_id": "mira_behind_tavern_curtain_unclear"
+        }
+      },
+      {
+        "id": "rumor_demo_r2",
+        "label": "靠近低声交谈的人群，听清他们提到的夜间动静",
+        "category": "social",
+        "source_fact": "demo_r2",
+        "reason": "你已听说：有人看见马库斯昨夜往仓库方向去，再也没回",
+        "intent": {
+          "action_type": "investigate",
+          "target": "overheard_group",
+          "location": "current",
+          "rumor_id": "demo_r2"
+        }
+      },
+      {
+        "id": "move_村口_仓库",
+        "label": "冒雨赶往村口外侧",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往仓库",
+        "intent": {}
+      },
+      {
+        "id": "move_村口_酒馆",
+        "label": "冒雨赶往酒馆",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "可从村口前往酒馆",
+        "intent": {}
+      },
+      {
+        "id": "rest",
+        "label": "在原地休整，恢复体力",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "seek_shelter",
+        "label": "寻找可避雨的遮蔽处等待天气好转",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "scout_perimeter",
+        "label": "沿村界巡逻一圈，标记异常",
+        "category": "survival",
+        "source_fact": "scene:村口",
+        "reason": "",
+        "intent": {}
+      },
+      {
+        "id": "free_input",
+        "label": "自由描述你想做的事…",
+        "category": "free",
+        "source_fact": "",
+        "reason": "",
+        "intent": {}
+      }
+    ],
+    "inline_choices_count": 6,
+    "narrative_plain_preview": "<p class=\"player-action\">你选择：<strong>“询问托马斯昨夜是否听见异常动静”</strong></p>\n<p class=\"result\">昨夜村口外侧确实有些动静，细节现在不能说。</p>\n<p class=\"result\">他压低声音，目光扫向木栅外，随即闭嘴。</p>\n<p class=\"consequence\"><em>信息：托马斯承认昨夜村口外侧有动静</em></p>\n<p class=\"consequence\"><em>托马斯没有解释为何要加强村口外侧巡逻。</em></p>\n<p class=\"world\">【危机】村口外侧似乎出现新的痕迹。</p>\n<p class=\"world\">【NPC】托马斯在村口召集同伴，强调今夜村口外侧加派哨岗。</p>\n<p class=\"world\">【NPC】米拉在酒馆低声与酒客交谈，神色忧虑。</p>"
+  }
+]

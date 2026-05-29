@@ -81,8 +81,20 @@ def _dedupe_events(events: list[dict[str, Any]], limit: int = 4) -> list[dict[st
     return out
 
 
-def run_world_ticks(state: GameState, ticks: int = 1) -> list[dict[str, Any]]:
-    """运行完整世界模拟滴答。"""
+def _classify_event_visibility(state: GameState, e: dict[str, Any]) -> str:
+    v = str(e.get("visibility") or "")
+    if v in ("public", "local", "hidden", "discovered"):
+        return v
+    # 默认：rumor/npc_action 属于 local；压力/系统通报属于 public
+    if e.get("type") in ("rumor", "npc_action"):
+        return "local"
+    if e.get("type") in ("pressure", "system"):
+        return "public"
+    return "public"
+
+
+def run_world_ticks(state: GameState, ticks: int = 1) -> dict[str, list[dict[str, Any]]]:
+    """运行完整世界模拟滴答（分层）。"""
     all_events: list[dict[str, Any]] = []
     for _ in range(ticks):
         all_events.extend(tick_crisis_escalation(state))
@@ -96,15 +108,42 @@ def run_world_ticks(state: GameState, ticks: int = 1) -> list[dict[str, Any]]:
                 "type": "pressure",
                 "text": "【压力】村民闭门不出，广场上空无一人。",
             })
-    return _dedupe_events(all_events, limit=4)
+    deduped = _dedupe_events(all_events, limit=8)
+    buckets: dict[str, list[dict[str, Any]]] = {
+        "public_events": [],
+        "local_events": [],
+        "discovered_events": [],
+        "hidden_events": [],
+    }
+    for e in deduped:
+        if not isinstance(e, dict) or not e.get("text"):
+            continue
+        vis = _classify_event_visibility(state, e)
+        # 硬性：hidden 默认永远不进入玩家可见 buckets（仍保留在 hidden_events 供内部）
+        if vis == "hidden":
+            buckets["hidden_events"].append(e)
+        elif vis == "discovered":
+            buckets["discovered_events"].append(e)
+        elif vis == "local":
+            buckets["local_events"].append(e)
+        else:
+            buckets["public_events"].append(e)
+    # 显示层合计限制：最多 4 条（优先 local/public）
+    buckets["public_events"] = buckets["public_events"][:2]
+    buckets["local_events"] = buckets["local_events"][:2]
+    buckets["discovered_events"] = buckets["discovered_events"][:2]
+    buckets["hidden_events"] = buckets["hidden_events"][:2]
+    return buckets
 
 
-def format_world_briefing(events: list[dict[str, Any]]) -> str:
+def format_world_briefing(events: list[dict[str, Any]] | dict[str, list[dict[str, Any]]]) -> str:
     if not events:
         return ""
-    lines = "".join(
-        f"<p class=\"world\">{e['text']}</p>" for e in events
-    )
+    if isinstance(events, dict):
+        visible = (events.get("public_events") or []) + (events.get("local_events") or [])
+    else:
+        visible = events
+    lines = "".join(f"<p class=\"world\">{e['text']}</p>" for e in visible if isinstance(e, dict) and e.get("text"))
     return f"<div class='world-briefing'>{lines}</div>"
 
 

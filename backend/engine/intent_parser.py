@@ -19,7 +19,8 @@ class ParsedIntent(BaseModel):
     dc: int = 12
     requires_roll: bool = True
     raw_input: str = ""
-    parse_source: str = "keyword"  # keyword | llm
+    parse_source: str = "keyword"  # keyword | llm | selected_action | free_text
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
 
 
 KEYWORD_RULES: list[tuple[str, str, dict[str, Any]]] = [
@@ -71,6 +72,7 @@ def _keyword_parse(player_input: str) -> ParsedIntent | None:
                 action_type=action_type,
                 raw_input=text,
                 parse_source="keyword",
+                confidence=0.92 if action_type != "unknown" else 0.35,
                 **extras,
             )
     return None
@@ -129,6 +131,7 @@ requires_roll: boolean
                 requires_roll=bool(data.get("requires_roll", True)),
                 raw_input=player_input,
                 parse_source="llm",
+                confidence=0.72 if data.get("action_type") not in (None, "", "unknown") else 0.45,
             )
     except Exception:
         return None
@@ -151,4 +154,5 @@ async def parse_intent(player_input: str, context: dict[str, Any]) -> ParsedInte
         dc=12,
         requires_roll=True,
         parse_source="keyword",
+        confidence=0.3,
     )

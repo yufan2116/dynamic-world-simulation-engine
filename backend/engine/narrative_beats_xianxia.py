@@ -74,8 +74,14 @@ def build_event_beats_xianxia(
         )
 
     if succeeded:
+        # 不允许输出“你完成 unknown/xxx”
+        if action in ("unknown", "", None):
+            return _merge_beat(
+                direct_result="你尝试这样做。",
+                scene_note=f"{loc}的灵力波动尚未平复",
+            )
         return _merge_beat(
-            direct_result=f"你完成{action}，注意到{clue}",
+            direct_result=f"你采取行动，注意到{clue}",
             scene_note=f"{loc}的灵力波动尚未平复",
         )
     return _merge_beat(

@@ -2,6 +2,7 @@ import type { FeedItem } from "../lib/worldEvents";
 import { getOntologyFromState, tensionFromState, uiTerm } from "../lib/ontology";
 import type { CrisisState, GameState } from "../types";
 import WorldEventFeed from "./WorldEventFeed";
+import RelationshipGraph from "./RelationshipGraph";
 
 interface Props {
   worldState: GameState | null;
@@ -50,7 +51,7 @@ export default function WorldPanel({ worldState, crisisState, eventFeed = [] }: 
   })();
 
   return (
-    <aside className="h-full flex flex-col rounded-lg border border-fantasy-border bg-fantasy-panel/90 p-3 shadow-lg overflow-hidden gap-3">
+    <aside className="h-full min-h-0 flex flex-col rounded-lg border border-fantasy-border bg-fantasy-panel/90 p-3 shadow-lg overflow-y-auto overscroll-contain gap-3">
       <h2 className="font-fantasy text-fantasy-gold text-sm tracking-widest shrink-0">
         {uiTerm(onto, "world_panel_title", "世界态势")}
       </h2>
@@ -60,7 +61,10 @@ export default function WorldPanel({ worldState, crisisState, eventFeed = [] }: 
         pulseTitle={uiTerm(onto, "world_pulse", "世界脉搏")}
         emptyText={uiTerm(onto, "world_pulse_empty", "世界尚在沉睡……")}
         categoryLabels={
-          (onto?.ui?.event_categories as Record<string, string> | undefined) ?? undefined
+          typeof (onto?.ui as unknown) === "object" && onto?.ui && "event_categories" in (onto.ui as object)
+            ? ((onto.ui as unknown as { event_categories?: Record<string, string> }).event_categories ??
+              undefined)
+            : undefined
         }
       />
 
@@ -81,6 +85,7 @@ export default function WorldPanel({ worldState, crisisState, eventFeed = [] }: 
         </div>
       )}
 
+      <>
       <Meter
         label={uiTerm(onto, "tension_meter", "社会紧张")}
         value={tension}
@@ -91,6 +96,7 @@ export default function WorldPanel({ worldState, crisisState, eventFeed = [] }: 
         value={warRisk}
         color="bg-red-600"
       />
+      </>
 
       {crisis && crisis.suspicious_clues.length > 0 && (
         <div className="shrink-0">
@@ -108,6 +114,10 @@ export default function WorldPanel({ worldState, crisisState, eventFeed = [] }: 
       {economyLine && (
         <p className="text-[10px] text-fantasy-muted shrink-0">{economyLine}</p>
       )}
+
+      <div className="shrink-0">
+        <RelationshipGraph worldState={worldState} />
+      </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <h3 className="text-fantasy-accent text-[10px] mb-1.5">

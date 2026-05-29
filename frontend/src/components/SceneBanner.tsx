@@ -41,7 +41,7 @@ export default function SceneBanner({
   const showPrologueOverlay = prologueMode && !hasBg;
 
   return (
-    <section className="scene-banner scene-banner-xianxia-glow relative rounded-xl border border-fantasy-border overflow-hidden shrink-0 shadow-xl shadow-black/50 h-[200px] md:h-[220px] theme-panel">
+    <section className="scene-banner scene-banner-xianxia-glow relative rounded-lg border border-fantasy-border overflow-hidden shrink-0 shadow-lg shadow-black/40 h-[108px] md:h-[118px] theme-panel">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={
@@ -54,43 +54,47 @@ export default function SceneBanner({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
       <div className={`absolute inset-0 pointer-events-none ${fx}`} aria-hidden />
 
-      <div className="relative z-10 h-full flex flex-col justify-end px-4 md:px-6 pb-3 pt-3">
-        <header>
+      <div className="relative z-10 h-full flex flex-col justify-end px-3 md:px-4 pb-2 pt-2">
+        <header className="min-w-0">
           {chapterTitle && (
-            <p className="text-[10px] tracking-[0.35em] text-fantasy-gold/70 uppercase mb-0.5">
+            <p className="text-[9px] tracking-[0.28em] text-fantasy-gold/70 uppercase truncate leading-none mb-0.5">
               {chapterTitle}
             </p>
           )}
-          <h1 className="font-fantasy text-lg md:text-xl text-fantasy-gold drop-shadow-lg">
-            {scene.locationTitle}
-          </h1>
-          <p className="text-[11px] text-fantasy-muted mt-0.5 flex flex-wrap gap-x-3">
-            <span>{scene.timeLabel}</span>
-            <span className="text-fantasy-text/85">{scene.weather}</span>
-            <span
-              className={
-                scene.dangerLevel === "高"
-                  ? "text-red-400"
-                  : scene.dangerLevel === "中"
-                    ? "text-amber-400"
-                    : "text-emerald-400"
-              }
-            >
-              危险 · {scene.dangerLevel}
-            </span>
-          </p>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
+            <h1 className="font-fantasy text-base md:text-lg text-fantasy-gold drop-shadow leading-tight">
+              {scene.locationTitle}
+            </h1>
+            <p className="text-[10px] text-fantasy-muted flex flex-wrap gap-x-2 leading-tight">
+              <span>{scene.timeLabel}</span>
+              <span className="text-fantasy-text/85">{scene.weather}</span>
+              <span
+                className={
+                  scene.dangerLevel === "高"
+                    ? "text-red-400"
+                    : scene.dangerLevel === "中"
+                      ? "text-amber-400"
+                      : "text-emerald-400"
+                }
+              >
+                危险·{scene.dangerLevel}
+              </span>
+            </p>
+          </div>
         </header>
 
-        <ul className="flex flex-wrap gap-1 mt-2">
-          {scene.props.map((prop) => (
-            <li
-              key={prop}
-              className="text-[9px] md:text-[10px] px-2 py-0.5 rounded-full bg-black/55 border border-fantasy-border/50 text-fantasy-text/90"
-            >
-              {prop}
-            </li>
-          ))}
-        </ul>
+        {scene.props.length > 0 && (
+          <ul className="flex flex-wrap gap-1 mt-1.5 max-h-[22px] overflow-hidden">
+            {scene.props.slice(0, 4).map((prop) => (
+              <li
+                key={prop}
+                className="text-[8px] md:text-[9px] px-1.5 py-px rounded-full bg-black/55 border border-fantasy-border/50 text-fantasy-text/85 truncate max-w-[7rem]"
+              >
+                {prop}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {showPrologueOverlay && (

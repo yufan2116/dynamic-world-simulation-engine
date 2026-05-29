@@ -10,49 +10,58 @@
   "priority": 10,
 
   "summary": {
-    "oneLine": "规则引擎维护可验证世界状态，LLM 只负责叙事与选项润色，支持多世界模板一键切换。",
-    "short": "Dynamic World Simulation Engine 是一款可运行的动态世界 RPG 原型：后端用确定性模拟（地点、NPC、危机、派系、谣言、经济）驱动状态变化，LLM 仅根据已发生事件生成叙事与内嵌选项，避免「换皮」式幻觉剧情。项目包含中世纪奇幻与仙侠两套完整世界模板、D20 检定、SQLite 持久化、按 Prompt 哈希缓存的 AI 场景/立绘，以及 React 叙事流 UI。",
-    "problem": "传统 AI 文字冒险常让模型直接「编世界」，导致地点、NPC、线索前后矛盾，且难以切换题材时真正替换规则与术语，玩家体验停留在换文案的换皮层。",
-    "solution": "将「世界真相」交给可测试的规则与 JSON 模板，LLM 只读事件日志做叙事渲染；通过 World Template、语义层（World Ontology）与内嵌选项管线，实现多世界数据、危机、UI 术语与插图风格的完整切换。"
+    "oneLine": "规则引擎维护可验证世界状态，LLM 只负责叙事与选项润色；作品集 Demo 采用完全脚本化路径保证稳定展示。",
+    "short": "Dynamic World Simulation Engine 是一款可运行的动态世界 RPG 原型：正式版由确定性模拟（地点、NPC、危机、派系、谣言、经济）驱动状态变化，LLM 仅根据已发生事件生成叙事与内嵌选项。作品集 Demo（《失踪的商人》）采用 node/choice 脚本（ravenford_demo_script.json），不调用 LLM 与 action_generator，保证演示稳定可控；Chapter Complete 页以玩家视角展示调查时间线、线索卡片与结局摘要。项目包含中世纪奇幻与仙侠两套世界模板、D20 检定、SQLite 持久化、按 Prompt 哈希缓存的 AI 场景/立绘，以及 React 叙事流 UI。",
+    "problem": "传统 AI 文字冒险常让模型直接「编世界」，导致地点、NPC、线索前后矛盾；作品集演示若依赖动态生成，还会出现重复选项、无关叙事与不可控结局。",
+    "solution": "正式版将「世界真相」交给可测试的规则与 JSON 模板，LLM 只读事件日志做叙事渲染；Demo 模式单独走 scripted_demo_runner，从预设脚本读取开场、选项、检定、线索与结局，与正式版 UI 共用同一套叙事呈现层。"
   },
 
   "role": {
     "title": "Creator & Full-Stack Developer",
     "responsibilities": [
-      "设计「确定性模拟 + 叙事层」分层架构与世界模板数据规范",
+      "设计「确定性模拟 + 叙事层」分层架构，以及 Demo / 正式版双路径",
       "实现 FastAPI 游戏循环、规则引擎、危机/谣言/派系等子系统",
-      "构建 React 叙事流、模板切换、WebSocket 图像进度与内嵌选项交互"
+      "构建 React 叙事流、Chapter Complete 总结页、模板切换与 WebSocket 图像进度"
     ],
     "contributions": [
       "落地多世界模板系统（medieval_dark_fantasy / xianxia_forbidden_land），每模板 9 类 JSON 配置",
-      "实现 choice_renderer 叙事化选项与刷新后选项自动恢复",
-      "完成图像 Prompt 哈希缓存、占位图与按模板画风 Guardrail"
+      "实现 Fully Scripted Demo（node/choice 脚本 + 玩家向 Session Summary）",
+      "完成 choice_renderer / narrative_formatter 叙事化呈现、图像 Prompt 哈希缓存与 Debug Inspector"
     ]
   },
 
   "techStack": {
     "frontend": ["React 18", "TypeScript", "Vite", "Tailwind CSS", "Axios"],
     "backend": ["Python 3.10+", "FastAPI", "Uvicorn", "Pydantic v2"],
-    "ai": ["DeepSeek API（叙事/意图）", "OpenAI Images API（可选立绘/场景）", "确定性 Fallback 叙事"],
+    "ai": ["DeepSeek API（正式版叙事/意图）", "OpenAI Images API（可选立绘/场景）", "确定性 Fallback 叙事"],
     "database": ["SQLite（aiosqlite）", "游戏状态 / 事件 / NPC 记忆 / 图像缓存"],
     "infra": ["WebSocket（图像生成进度）", "Vite Dev Proxy"],
-    "tools": ["Git", "dotenv"]
+    "tools": ["Git", "dotenv", "pytest"]
   },
 
   "highlights": [
-    "确定性世界状态",
-    "多世界模板",
-    "叙事内嵌选项",
-    "D20 规则引擎"
+    "确定性世界状态（正式版）",
+    "Fully Scripted Demo（作品集稳定展示）",
+    "Chapter Complete 玩家向总结页",
+    "多世界模板热切换",
+    "叙事内嵌选项 + D20 检定",
+    "Narrative Formatter 侦探笔记式呈现",
+    "Debug / Inspector 证据链（开发者向）",
+    "回合回退与同 Seed 分叉"
   ],
 
   "features": [
+    "双运行模式：正式版（意图 → D20 → world_tick → LLM 叙事 → action_generator 选项）与 Demo 版（scripted_demo_runner 读 JSON 脚本，零 LLM）",
+    "Demo 脚本图：opening / nodes / choices / dice / blocks / notebook / endings，含成功与失败路线分支",
+    "Chapter Complete：结局摘要、调查时间线、关键线索卡片、NPC 关系、调查统计；隐藏 action_id 与内部节点名",
     "多世界模板热切换：地点、NPC、派系、危机、谣言、开场叙事与 UI 术语一并替换",
-    "每回合：意图解析 → D20 检定 → 世界模拟 Tick → 事件持久化 → LLM 叙事 → 内嵌 CRPG 选项",
-    "动态危机升级、谣言传播图、派系博弈与模板化经济模拟",
+    "动态危机升级、谣言传播图、派系博弈与模板化经济模拟（正式版）",
     "AI 肖像/场景图按 Prompt MD5 缓存，WebSocket 推送生成进度",
-    "序幕 + 主叙事流、世界态势面板、自由文本行动与叙事选项并行",
-    "离线时间追赶（offline sim）与叙事历史刷新恢复"
+    "序幕 + 主叙事流、世界态势面板、自由文本行动与叙事选项并行（正式版）",
+    "Debug / Inspector：按回合展示 Intent / D20 / World Tick / Scene Graph / Event Beats / LLM Prompt / Final Narrative",
+    "Replay & Proof：叙事输入 payload 与输出哈希持久化",
+    "回合回退（rewind）与同一初始 Seed 的分叉（fork）",
+    "Template Consistency Checker：扫描模板 JSON，检测跨题材残留词"
   ],
 
   "sections": [
@@ -60,35 +69,35 @@
       "id": "background",
       "title": "项目背景",
       "type": "text",
-      "content": "项目源于对「AI 跑团 / 文字冒险」可靠性的探索：玩家需要可推理、可存档、可复盘的世界，而不是模型即兴编造。MVP 以「失踪商人」中世纪剧本验证核心链路，并扩展至仙侠「葬仙渊」模板，证明同一引擎可承载不同题材的规则与语义，而非仅替换文案与图片。\n\n设计铁律：世界状态仅由 world_simulator、rule_engine 与各 Tick 子系统修改；LLM 提示词禁止杜撰未在事件日志中出现的事实；无 API Key 时回退到确定性叙事模板。"
+      "content": "项目源于对「AI 跑团 / 文字冒险」可靠性的探索：玩家需要可推理、可存档、可复盘的世界，而不是模型即兴编造。MVP 以「失踪商人」中世纪剧本验证核心链路，并扩展至仙侠「葬仙渊」模板。\n\n设计铁律：正式版世界状态仅由 world_simulator、rule_engine 与各 Tick 子系统修改；LLM 提示词禁止杜撰未在事件日志中出现的事实。作品集 Demo 单独采用 Fully Scripted Demo：数据来自 backend/data/demo_scripts/ravenford_demo_script.json，保证演示不随机、不重复、能完整走到结局。"
     },
     {
       "id": "architecture",
       "title": "系统架构",
       "type": "architecture",
       "content": {
-        "overview": "玩家输入 → 意图解析 → D20 检定 → 世界模拟（危机/谣言/派系/经济 Tick）→ SQLite 事件与记忆 → LLM 叙事 → choice_renderer 内嵌选项 → 前端叙事流",
+        "overview": "正式版：玩家输入 → 意图解析 → D20 → 世界模拟 Tick → SQLite → LLM 叙事 → action_generator → choice_renderer → 前端。Demo 版：POST /game/new-demo → scripted_demo_runner 读脚本 → blocks_to_html 叙事 → 预设 inline_choices，全程不调用 LLM / world_tick / action_generator。",
         "image": "architecture.png",
         "modules": [
           {
             "name": "GameLoop",
-            "description": "编排开局、行动处理、状态持久化与 API 响应打包（含 inline_choices、图像 URL）"
+            "description": "编排开局、行动处理、状态持久化；Demo 与正式版分支处理"
           },
           {
-            "name": "World Template Manager",
-            "description": "加载 world_templates 下 JSON  bundle，创建 GameState 并注入语义层与图像实体注册表"
+            "name": "Scripted Demo Runner",
+            "description": "读取 ravenford_demo_script.json，按 choice_id → next 节点跳转，返回预设 narrative / dice / choices / session_summary"
           },
           {
             "name": "World Simulator + Rule Engine",
-            "description": "确定性修改地点、NPC、旗帜与检定结果；LLM 不可直接写世界"
-          },
-          {
-            "name": "Crisis / Rumor / Faction / Economy Sim",
-            "description": "按模板分叉的危机升级、谣言扩散、派系力量与经济指标 Tick"
+            "description": "正式版确定性修改地点、NPC、旗帜与检定结果；LLM 不可直接写世界"
           },
           {
             "name": "Narrative Engine + Choice Renderer",
-            "description": "基于事件日志生成 HTML 叙事，并将 available_actions 转为叙事化内嵌选项"
+            "description": "blocks_to_html / narrative_formatter 统一叙事呈现；正式版由 action_generator 生成分组行动"
+          },
+          {
+            "name": "Chapter Complete",
+            "description": "build_session_summary 打包玩家向结局页：时间线、线索卡片、NPC 关系、调查统计"
           },
           {
             "name": "Image Service + WebSocket Hub",
@@ -96,7 +105,7 @@
           },
           {
             "name": "React Narrative UI",
-            "description": "叙事流、内嵌选项、世界面板、模板选择与自由输入底栏"
+            "description": "叙事流、内嵌选项、世界面板、Chapter Complete 弹层与 Debug Inspector"
           }
         ]
       }
@@ -106,11 +115,11 @@
       "title": "技术亮点",
       "type": "features",
       "content": [
-        "World Ontology 语义层：core / ui / economy / crisis / role_labels 等术语随模板注入 flags，前端统一 uiTerm 渲染",
-        "action_generator 按场景动态生成分组行动，choice_renderer 评分选取 Top-N 并润色为扮演式选项",
-        "narrative_log 持久化带选项 HTML，刷新后 extractChoicesFromHtml + get_state 双通道恢复选项",
-        "图像实体 registry（player:portrait / loc:* / npc:*）与模板级会话缓存，避免切回模板重复生图",
-        "仙侠与中世纪危机分叉（crisis_xianxia vs crisis_escalation），避免单一剧本硬编码"
+        "Demo / 正式版双路径：is_scripted_demo_mode 短路 generate_actions 与 LLM，作品集与引擎能力分离展示",
+        "脚本节点含 branch（min_clues）实现成功/失败结局分流，pytest 覆盖完整路线",
+        "Session Summary 仅输出玩家可读字段（timeline / clue_cards / player_stats），不暴露 action_id",
+        "World Ontology 语义层：core / ui / economy / crisis 等术语随模板注入，前端 uiTerm 统一渲染",
+        "narrative_log 持久化带选项 HTML，刷新后 extractChoicesFromHtml + get_state 双通道恢复选项"
       ]
     },
     {
@@ -119,24 +128,24 @@
       "type": "challenges",
       "content": [
         {
+          "title": "作品集 Demo 不稳定",
+          "problem": "动态 action_generator + LLM 导致重复对话、无关选项、无法稳定走到结局。",
+          "solution": "Demo 改为 Fully Scripted Demo：单一 JSON 脚本定义全流程；正式版保留动态系统。"
+        },
+        {
           "title": "LLM 幻觉 vs 世界一致性",
           "problem": "若让模型直接决定剧情走向，会出现未解锁 NPC、错误地点与矛盾线索。",
-          "solution": "所有状态变更走 world_simulator；叙事 prompt 仅包含事件日志与当前 flags；无 Key 时使用 fallback 叙事。"
+          "solution": "正式版所有状态变更走 world_simulator；叙事 prompt 仅包含事件日志与 flags。"
+        },
+        {
+          "title": "Ending Screen 像调试页",
+          "problem": "Session Summary 曾直接展示 ask_elena_last_seen 等 action_id。",
+          "solution": "process 时记录人类可读 timeline；Chapter Complete UI 只展示故事摘要、时间线、线索卡片与人物关系。"
         },
         {
           "title": "多世界「换皮」问题",
-          "problem": "切换题材后仍出现酒馆、粮价、失踪案等中世纪语义。",
-          "solution": "每模板独立 JSON（含 world_terms.json）+ attach_ontology_to_state；经济与危机模块按 is_xianxia 分叉。"
-        },
-        {
-          "title": "选项展示与刷新丢失",
-          "problem": "底栏备用面板与刷新后 inline_choices 缺失导致无法操作。",
-          "solution": "选项仅内嵌叙事流；开局写入 narrative_with_choices；get_state 返回当前 inline_choices；谣言等运行时补全 id。"
-        },
-        {
-          "title": "图像成本与切换体验",
-          "problem": "换模板或重进游戏时重复调用图像 API，加载慢。",
-          "solution": "Prompt MD5 文件缓存 + completed/total 判断是否跳过 ensure_template_assets；前端按 templateId 会话缓存 URL。"
+          "problem": "切换题材后仍出现中世纪语义残留。",
+          "solution": "每模板独立 9 类 JSON + attach_ontology_to_state；危机/经济模块按模板分叉。"
         }
       ]
     }
@@ -150,22 +159,22 @@
       "trend": "optimal"
     },
     {
-      "label": "模板配置维度",
-      "value": "9 JSON / 模板",
-      "description": "world / locations / npcs / factions / rumors / crisis / art / narrative / world_terms",
+      "label": "Demo 脚本节点",
+      "value": "12+",
+      "description": "ravenford_demo_script.json 含开场、分支与双结局",
       "trend": "optimal"
     },
     {
-      "label": "API 回合延迟",
+      "label": "后端测试",
+      "value": "64+",
+      "description": "含 scripted demo 路线、session summary 与正式版子系统",
+      "trend": "optimal"
+    },
+    {
+      "label": "正式版 API 延迟",
       "value": "2–8s",
-      "description": "含 LLM 叙事时（视模型与网络）",
+      "description": "含 LLM 叙事时（Demo 模式近即时）",
       "trend": "neutral"
-    },
-    {
-      "label": "图像缓存命中",
-      "value": "按 hash",
-      "description": "同 Prompt 不重复调用 Images API",
-      "trend": "optimal"
     }
   ],
 
@@ -176,41 +185,78 @@
     "video": "demo.mp4",
     "screenshots": [
       {
-        "title": "叙事流与内嵌选项",
-        "description": "主叙事区展示节拍化 HTML 与「你现在可以」编号选项，底栏仅保留自由输入",
-        "file": "screenshots/01-narrative-choices.png"
+        "title": "Demo 开场与内嵌选项",
+        "description": "《失踪的商人》脚本化开场：场景描写、NPC 对话、四条调查选项；右侧世界态势面板",
+        "file": "screenshots/01-demo-opening-choices.png",
+        "captureGuide": "POST /game/new-demo 后第一屏；确保可见开场叙事 + 4 条选项 + 右侧状态栏，不要截 Debug Inspector"
       },
       {
-        "title": "世界模板切换",
-        "description": "左侧模板选择器切换 medieval / xianxia，联动 UI 主题与术语",
-        "file": "screenshots/02-template-switch.png"
+        "title": "调查回合：检定 + 线索 + 笔记",
+        "description": "D20 检定块、对话节拍、获得线索与调查笔记，体现 CRPG 日志感",
+        "file": "screenshots/02-investigation-turn-dice-clue.png",
+        "captureGuide": "选择「安慰艾琳娜」或「检查泥地」后；需同时出现检定框、对话/结果、金色线索行与笔记区块"
       },
       {
-        "title": "世界态势面板",
-        "description": "危机压力、社会紧张、线索与模板化事件流",
-        "file": "screenshots/03-world-panel.png"
+        "title": "推理链推进（多步后）",
+        "description": "连续调查后的叙事流：已确认事实、下一步选项与上下文连贯",
+        "file": "screenshots/03-investigation-midgame.png",
+        "captureGuide": "走完 3–4 步（如艾琳娜→货物→托马斯→泥地）；滚动到最新条目，展示选项与上文线索呼应"
       },
       {
-        "title": "场景与立绘",
-        "description": "按模板画风生成的场景横幅与角色立绘（哈希缓存）",
-        "file": "screenshots/04-scene-portrait.png"
+        "title": "Chapter Complete 结局页",
+        "description": "玩家向总结：结局摘要、调查时间线、关键线索卡片、人物关系、调查统计",
+        "file": "screenshots/04-chapter-complete.png",
+        "captureGuide": "走成功路线至 ending_good；全屏截 Chapter Complete 弹层，确认无 action_id，时间线为中文行动描述"
+      },
+      {
+        "title": "失败结局对比",
+        "description": "过早进入黑森林的 ending_bad，展示分支与代价叙事",
+        "file": "screenshots/05-ending-bad-optional.png",
+        "captureGuide": "仅 inspect_mud 后选 go_forest；截结局弹层标题「误入陷阱」"
+      },
+      {
+        "title": "多世界模板切",
+        "description": "POST /game/start 或切换 xianxia 模板，展示引擎动态能力与术语切换",
+        "file": "screenshots/06-full-mode-optional.png",
+        "captureGuide": "用于对比 Demo 与正式版；截模板切换或 Debug Inspector 证据链其一即可"
       }
-    ]
+    ],
+    "screenshotPriority": {
+      "mustHave": [
+        "screenshots/01-demo-opening-choices.png",
+        "screenshots/02-investigation-turn-dice-clue.png",
+        "screenshots/04-chapter-complete.png"
+      ],
+      "recommended": [
+        "screenshots/03-investigation-midgame.png"
+      ],
+      "optional": [
+        "screenshots/05-ending-bad-optional.png",
+        "screenshots/06-full-mode-optional.png"
+      ]
+    }
   },
 
   "demo": {
     "available": true,
-    "mode": "本地开发（需配置 backend/.env）",
+    "mode": "本地开发（需配置 backend/.env；Demo 模式不依赖 LLM Key）",
     "commands": [
       "cd backend && pip install -r requirements.txt",
       "uvicorn main:app --reload --host 127.0.0.1 --port 8000",
       "cd frontend && npm install && npm run dev"
     ],
+    "entryPoints": {
+      "portfolioDemo": "前端 Demo 入口 → POST /game/new-demo（scripted_demo_runner）",
+      "fullGame": "POST /game/start → 动态模拟 + LLM 叙事"
+    },
     "scenarios": [
-      "POST /game/start 开局 → 序幕后主叙事自动出现内嵌选项",
+      "Demo：开局 4 选项 → 成功路线 ask_elena_last_seen → ask_elena_cargo → ask_thomas_last_seen → inspect_mud → go_warehouse → go_forest → ending_good",
+      "Demo：失败路线 inspect_mud → go_forest → ending_bad",
+      "完成调查后 Chapter Complete：时间线、线索卡片、NPC 关系、调查统计（无 action_id）",
+      "点击「查看完整冒险日志」回到叙事流回顾全过程",
+      "正式版：POST /game/start → D20 + 世界 Tick + LLM 叙事 + 动态选项",
       "切换世界模板至 xianxia_forbidden_land，观察术语/危机/UI 主题变化",
-      "选择叙事选项或底栏自由输入 → 查看 D20 检定与世界事件反馈",
-      "刷新页面后选项与叙事历史从 SQLite + get_state 恢复"
+      "打开 Debug / Inspector 查看正式版证据链（作品集主图可不展示）"
     ]
   },
 
@@ -223,34 +269,34 @@
 
   "resumeBullets": {
     "zh": [
-      "设计并实现「确定性世界模拟 + LLM 叙事层」架构，将状态变更与叙事生成解耦，降低 AI 跑团幻觉",
-      "构建多世界 JSON 模板系统（地点/NPC/危机/语义/画风），支持中世纪与仙侠完整切换",
-      "开发 FastAPI 游戏循环、D20 规则引擎、危机/谣言/派系 Tick 及 SQLite 事件持久化",
-      "实现 React 叙事流 UI、内嵌 CRPG 选项、WebSocket 图像进度与 Prompt 哈希缓存"
+      "设计「确定性世界模拟 + LLM 叙事层」双路径架构；作品集 Demo 采用完全脚本化保证稳定展示",
+      "实现 scripted_demo_runner（node/choice 脚本图）与玩家向 Chapter Complete 总结页",
+      "构建多世界 JSON 模板系统，支持中世纪与仙侠完整切换",
+      "开发 FastAPI 游戏循环、D20 规则引擎、危机/谣言 Tick、SQLite 持久化与 React 叙事流 UI"
     ],
     "en": [
-      "Architected a deterministic world simulation runtime with LLM-only narrative rendering to prevent state hallucinations in AI-driven RPGs",
-      "Built a multi-world JSON template system (locations, NPCs, crisis, ontology, art) supporting medieval fantasy and xianxia themes",
-      "Implemented FastAPI game loop, D20 rule engine, crisis/rumor/faction ticks, and SQLite event persistence",
-      "Delivered React narrative UI with inline choices, WebSocket image progress, and hash-based image caching"
+      "Architected dual-path runtime: deterministic simulation for full game, fully scripted demo for portfolio stability",
+      "Built scripted_demo_runner with branch endings and player-facing Chapter Complete session summary",
+      "Implemented multi-world JSON templates (medieval / xianxia) with ontology-driven UI terminology",
+      "Delivered FastAPI game loop, D20 engine, crisis/rumor ticks, SQLite persistence, and React narrative UI"
     ]
   },
 
   "interview": {
-    "pitchZh": "这是一个把 AI 文字冒险做成「可验证世界」的运行时：规则引擎和 JSON 模板管真相，LLM 只根据事件日志写故事和选项；同一套代码能跑中世纪查案和仙侠禁地，而不是换几段文案。",
-    "pitchEn": "A runtime that keeps world truth in deterministic simulation and JSON templates while the LLM only narrates logged events—supporting full theme switches (medieval vs xianxia), not just reskinned text.",
+    "pitchZh": "这是一个把 AI 文字冒险做成「可验证世界」的运行时：正式版用规则引擎管真相、LLM 只写故事；作品集 Demo 用脚本图保证每次演示都完整、可控、像成品游戏。",
+    "pitchEn": "A runtime separating world truth (deterministic sim) from narration (LLM), with a fully scripted portfolio demo that always delivers a polished end-to-end investigation story.",
     "qa": [
       {
+        "q": "为什么 Demo 不用 LLM？",
+        "a": "作品集需要稳定、可复现、无随机错误。Demo 读 ravenford_demo_script.json 预设全流程；正式版仍保留动态模拟与 LLM，展示引擎真实能力。"
+      },
+      {
         "q": "为什么不让 LLM 直接决定剧情？",
-        "a": "状态必须可回放、可测试。模型擅长语言，不擅长长期一致的状态机；因此由 world_simulator 改状态，LLM 只读 events 输出叙事。"
+        "a": "状态必须可回放、可测试。正式版由 world_simulator 改状态，LLM 只读 events 输出叙事。"
       },
       {
-        "q": "多世界模板如何避免换皮？",
-        "a": "每模板独立 locations/npcs/crisis/world_terms 等 9 类配置，引擎层 crisis_xianxia、economy_sim 等按模板分叉，UI 通过 world_ontology 读术语。"
-      },
-      {
-        "q": "选项是如何生成并展示的？",
-        "a": "action_generator 按当前场景生成分组行动，choice_renderer 评分取 Top-N 润色为叙事选项，API 返回 inline_choices；前端只在叙事流展示，刷新时从 HTML 或 get_state 恢复。"
+        "q": "Chapter Complete 如何做到玩家向？",
+        "a": "process 时记录人类可读 timeline 与 notebook；session_summary 只输出结局摘要、线索卡片、NPC 关系与统计，前端不渲染 action_id。"
       }
     ]
   },
@@ -259,6 +305,7 @@
     "AI RPG",
     "World Simulation",
     "LLM Narrative",
+    "Interactive Fiction",
     "FastAPI",
     "React",
     "Game Engine"
@@ -274,26 +321,32 @@
       {
         "state": "uninitialized",
         "label": "未初始化",
-        "description": "无存档，等待 /game/start 或 /game/load-template",
-        "transitions": "prologue | playing"
+        "description": "无存档，等待 /game/start 或 /game/new-demo",
+        "transitions": "prologue | playing | demo_playing"
       },
       {
-        "state": "prologue",
-        "label": "序幕",
-        "description": "展示开场序幕，主叙事与选项已就绪，横幅处于序幕样式",
-        "transitions": "playing"
+        "state": "demo_playing",
+        "label": "Demo 进行中",
+        "description": "scripted_demo_runner 按 choice_id 跳转脚本节点",
+        "transitions": "chapter_complete"
       },
       {
         "state": "playing",
-        "label": "进行中",
-        "description": "玩家可选择内嵌选项或自由输入，每回合触发模拟与叙事",
-        "transitions": "processing | playing"
+        "label": "正式版进行中",
+        "description": "动态模拟 + LLM 叙事 + action_generator 选项",
+        "transitions": "processing | chapter_complete"
       },
       {
         "state": "processing",
         "label": "回合处理",
-        "description": "后端执行意图解析、检定、世界 Tick、LLM 叙事与选项打包",
+        "description": "意图解析、检定、世界 Tick、叙事与选项打包",
         "transitions": "playing"
+      },
+      {
+        "state": "chapter_complete",
+        "label": "章节完成",
+        "description": "展示 Chapter Complete 总结页，可再玩 Demo 或查看冒险日志",
+        "transitions": "uninitialized"
       }
     ],
     "timeline": [
@@ -301,40 +354,40 @@
         "id": "1",
         "time": "00:00.000",
         "type": "status",
-        "label": "加载世界模板",
-        "detail": "world_template_manager 构建 GameState 与 image_entities",
+        "label": "Demo 开局",
+        "detail": "init_scripted_demo + opening.blocks + start.choices",
         "status": "done"
       },
       {
         "id": "2",
-        "time": "00:01.000",
-        "type": "status",
-        "label": "返回开场叙事与 inline_choices",
-        "detail": "choice_renderer 打包选项，可选异步生图",
+        "time": "00:02.000",
+        "type": "action",
+        "label": "玩家选择",
+        "detail": "process_scripted_demo_choice → 预设 narrative / dice / notebook",
         "status": "done"
       },
       {
         "id": "3",
-        "time": "00:05.000",
-        "type": "action",
-        "label": "玩家行动",
-        "detail": "POST /game/action",
+        "time": "00:04.000",
+        "type": "status",
+        "label": "调查推进",
+        "detail": "timeline 记录人类可读步骤，notebook 同步右侧状态",
         "status": "done"
       },
       {
         "id": "4",
-        "time": "00:06.000",
+        "time": "00:30.000",
         "type": "status",
-        "label": "世界 Tick",
-        "detail": "危机 / 谣言 / 派系 / 经济 simulation",
+        "label": "结局分支",
+        "detail": "go_forest branch min_clues → ending_good | ending_bad",
         "status": "done"
       },
       {
         "id": "5",
-        "time": "00:08.000",
+        "time": "00:31.000",
         "type": "status",
-        "label": "叙事与选项更新",
-        "detail": "append_narrative + 前端叙事流追加",
+        "label": "Chapter Complete",
+        "detail": "session_summary → 结局摘要 / 时间线 / 线索卡片",
         "status": "done"
       }
     ],
@@ -342,14 +395,14 @@
       {
         "id": "refresh",
         "title": "刷新恢复",
-        "description": "GET /game/state 恢复 narrative_history、inline_choices 与 available_actions",
+        "description": "GET /game/state 恢复 narrative_history 与 inline_choices",
         "icon": "RefreshCw"
       },
       {
-        "id": "fallback-narrative",
-        "title": "无 Key 降级",
-        "description": "未配置 LLM Key 时使用确定性 fallback 叙事，核心模拟仍可运行",
-        "icon": "Shield"
+        "id": "scripted-demo",
+        "title": "脚本 Demo",
+        "description": "无 LLM Key 也可完整跑通作品集演示",
+        "icon": "BookOpen"
       },
       {
         "id": "image-cache",

@@ -18,5 +18,6 @@
   "danger_level": "中",
   "war_risk": 28,
   "opening_scene": true,
-  "scene_npcs": ["托马斯", "艾琳娜"]
+  "scene_npcs": ["托马斯", "艾琳娜"],
+  "vertical_slice_demo": true
 }

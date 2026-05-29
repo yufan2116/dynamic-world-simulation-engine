@@ -118,9 +118,8 @@ def _beat_investigate(outcome: str, succeeded: bool, state: GameState, changes: 
         )
     if not succeeded:
         return _merge_beat(
-            direct_result="你只翻出一堆破麻袋和散落的谷物",
-            npc_reaction="仓库外传来脚步声——有人正在靠近",
-            consequence="仓库方向传出异常声响",
+            direct_result="你没有得到明确的新信息。",
+            consequence="你确认当前场景暂时没有更多可见异常。",
         )
     if changes.get("clue"):
         return _merge_beat(
@@ -241,8 +240,15 @@ def build_event_beats(
     succeeded = bool(changes.get("check_succeeded", True))
     outcome = _outcome_key(dice, succeeded)
 
-    preset = _beat_from_world_blocks(action, target, succeeded, changes)
-    if preset:
+    if changes.get("resolver_beats") and isinstance(changes["resolver_beats"], dict):
+        beat = dict(changes["resolver_beats"])
+    else:
+        beat = None
+
+    preset = None if beat else _beat_from_world_blocks(action, target, succeeded, changes)
+    if beat:
+        pass
+    elif preset:
         beat = preset
     elif action == "move" and changes.get("moved_to"):
         beat = _beat_move(state, changes)
@@ -274,35 +280,51 @@ def build_event_beats(
         prev = beat.get("consequence") or ""
         beat["consequence"] = "；".join(filter(None, [prev, *extras]))
 
-    tick = changes.get("world_tick_events") or []
-    if tick:
+    # talk/ask 必须有答复/反应信息（强制落地）
+    if changes.get("npc_answer") and not beat.get("npc_reaction"):
+        beat["npc_reaction"] = str(changes["npc_answer"])
+    if changes.get("npc_reaction") and not beat.get("npc_reaction"):
+        beat["npc_reaction"] = str(changes["npc_reaction"])
+    if changes.get("no_new_information_reason") and not beat.get("consequence"):
+        beat["consequence"] = str(changes["no_new_information_reason"])
+
+    tick = changes.get("world_tick_events") or {}
+    if isinstance(tick, dict):
+        visible = (tick.get("public_events") or []) + (tick.get("local_events") or [])
+        beat["world_events"] = [e.get("text", "") for e in visible if isinstance(e, dict) and e.get("text")]
+    elif isinstance(tick, list) and tick:
         beat["world_events"] = [e.get("text", "") for e in tick if e.get("text")]
 
     beat["outcome"] = outcome
     return beat
 
 
-def beats_to_html(beat: dict[str, Any]) -> str:
+def beats_to_html(beat: dict[str, Any], state: GameState | None = None) -> str:
     """将结构化节拍渲染为分层 HTML（回退用）。"""
+    from engine.narrative_formatter import format_world_event_text, polish_prose
+
     parts: list[str] = []
     if beat.get("scene_note"):
-        parts.append(f'<p class="scene">{beat["scene_note"]}</p>')
+        parts.append(f'<p class="scene">{polish_prose(str(beat["scene_note"]))}</p>')
     if beat.get("direct_result"):
-        parts.append(f'<p class="result">{beat["direct_result"]}</p>')
+        parts.append(f'<p class="result">{polish_prose(str(beat["direct_result"]))}</p>')
     if beat.get("npc_reaction"):
-        text = beat["npc_reaction"]
+        text = polish_prose(str(beat["npc_reaction"]))
         if "：" in text or ":" in text:
             parts.append(f'<p class="dialogue">{text}</p>')
         else:
             parts.append(f'<p class="result">{text}</p>')
     if beat.get("new_information"):
-        parts.append(
-            f'<p class="consequence"><em>信息：{beat["new_information"]}</em></p>'
-        )
+        info = polish_prose(str(beat["new_information"]))
+        parts.append(f'<p class="scene">【你注意到：{info}】</p>')
     if beat.get("consequence"):
-        parts.append(f'<p class="consequence"><em>{beat["consequence"]}</em></p>')
+        c = polish_prose(str(beat["consequence"]))
+        if c:
+            parts.append(f'<p class="scene">【{c}】</p>')
     for line in beat.get("world_events") or []:
-        parts.append(f'<p class="world">{line}</p>')
+        formatted = format_world_event_text(str(line), state)
+        if formatted:
+            parts.append(f'<p class="world">{formatted}</p>')
     if not parts:
         parts.append('<p class="scene">四周一片安静，你暂时按兵不动。</p>')
     return "\n".join(parts)
@@ -315,4 +337,4 @@ def build_narrative(
     changes: dict[str, Any],
 ) -> str:
     """兼容入口：返回分层 HTML（无 LLM 时使用）。"""
-    return beats_to_html(build_event_beats(state, intent, dice, changes))
+    return beats_to_html(build_event_beats(state, intent, dice, changes), state)

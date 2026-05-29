@@ -121,7 +121,7 @@ export interface UiTheme {
   atmosphere?: string;
 }
 
-export interface StartGameResponse extends ImageUrlsPayload {
+export interface StartGameResponse extends ImageUrlsPayload, ChapterCompletePayload {
   prologue: string;
   narrative: string;
   visuals_pending?: boolean;
@@ -138,12 +138,19 @@ export interface StartGameResponse extends ImageUrlsPayload {
   game_mode?: "random" | "demo";
   inline_choices?: InlineChoice[];
   choice_transition?: string;
+  investigation_mode?: boolean;
+  investigation_ui?: InvestigationUi;
+  investigation_board?: InvestigationBoard;
 }
 
-export interface ActionResponse extends ImageUrlsPayload {
+export interface ActionResponse extends ImageUrlsPayload, ChapterCompletePayload {
   narrative: string;
   inline_choices?: InlineChoice[];
   choice_transition?: string;
+  player_raw_input?: string;
+  selected_choice_text?: string | null;
+  parsed_intent?: unknown;
+  intent_confidence?: number;
   chapter?: { number: number; title: string };
   crisis_state?: CrisisState;
   available_actions?: AvailableActions;
@@ -152,6 +159,9 @@ export interface ActionResponse extends ImageUrlsPayload {
   dice_roll_info: DiceRollInfo | null;
   world_state: GameState;
   turn?: number;
+  investigation_mode?: boolean;
+  investigation_ui?: InvestigationUi;
+  investigation_board?: InvestigationBoard;
 }
 
 export interface NarrativeLogEntry {
@@ -160,7 +170,7 @@ export interface NarrativeLogEntry {
   turn?: number;
 }
 
-export interface GameStateResponse extends ImageUrlsPayload {
+export interface GameStateResponse extends ImageUrlsPayload, ChapterCompletePayload {
   initialized: boolean;
   world_state?: GameState;
   crisis_state?: CrisisState;
@@ -173,6 +183,39 @@ export interface GameStateResponse extends ImageUrlsPayload {
   npc_memories?: Record<string, string[]>;
   events?: GameEventItem[];
   event_log?: unknown[];
+  investigation_mode?: boolean;
+  investigation_ui?: InvestigationUi;
+  investigation_board?: InvestigationBoard;
+}
+
+export interface InspectorResponse {
+  initialized: boolean;
+  turns: number[];
+  turn: number | null;
+  blocks?: {
+    intent_parser?: unknown;
+    rule_result?: unknown;
+    world_tick?: unknown;
+    world_change?: unknown;
+    npc_memory_diff?: unknown;
+    sim_metrics_diff?: unknown;
+    scene_graph?: unknown;
+    event_beats?: unknown;
+    llm_prompt?: unknown;
+    final_narrative?: string | null;
+    narrative_sha256?: string | null;
+  };
+  raw_events?: GameEventItem[];
+}
+
+export interface BranchInfo {
+  branch_id: string;
+  seed_id: string;
+  template_id: string;
+  parent_branch_id?: string | null;
+  fork_turn?: number | null;
+  label?: string | null;
+  created_at?: string;
 }
 
 export interface GenerateImageResponse {
@@ -205,9 +248,72 @@ export interface ChapterInfo {
   title: string;
 }
 
+export interface TimelineEntry {
+  turn: number;
+  title: string;
+  check?: string;
+  check_success?: boolean;
+  clue?: string;
+}
+
+export interface ClueCard {
+  text: string;
+  source?: string;
+}
+
+export interface NpcRelationshipSummary {
+  name: string;
+  status: string;
+  detail?: string;
+}
+
+export interface PlayerStats {
+  turns: number;
+  clues_found: number;
+  checks_passed?: number;
+  checks_failed?: number;
+  crisis_label?: string;
+}
+
+export interface SessionSummary {
+  chapter?: ChapterInfo;
+  ending?: {
+    title: string;
+    subtitle?: string;
+    epigraph?: string;
+    summary?: string;
+  };
+  ending_summary?: string;
+  timeline?: TimelineEntry[];
+  clue_cards?: ClueCard[];
+  player_stats?: PlayerStats;
+  turns_played?: number;
+  /** @deprecated 旧版字段，仅作兼容 */
+  key_choices?: { turn: number; label: string }[];
+  clues?: { discovered: string[]; missed?: string[] };
+  investigation_routes?: {
+    id: string;
+    label: string;
+    progress: number;
+    max: number;
+    explored: boolean;
+  }[];
+  npc_relationships?: (NpcRelationshipSummary | { name: string; attitude: string; value: number })[];
+}
+
+export interface ChapterCompletePayload {
+  chapter_complete?: boolean;
+  session_summary?: SessionSummary;
+  chapter_ending_id?: string;
+  vertical_slice?: boolean;
+  investigation_mode?: boolean;
+  investigation_ui?: InvestigationUi;
+}
+
 export type ImageStylePreset = "medieval fantasy" | "xianxia" | "cyberpunk";
 
 export type NarrativeBlockKind =
+  | "player-action"
   | "scene"
   | "result"
   | "npc"
@@ -219,6 +325,12 @@ export type NarrativeBlockKind =
   | "choices"
   | "system";
 
+export interface ChoiceGameplay {
+  cost?: string;
+  reward?: string;
+  risk?: string;
+}
+
 export interface InlineChoice {
   id: string;
   text: string;
@@ -227,6 +339,65 @@ export interface InlineChoice {
   risk?: string;
   category?: string;
   is_free?: boolean;
+  disabled?: boolean;
+  lock_reason?: string | null;
+  intent_payload?: unknown;
+  source?: { type: string; id: string; label: string } | null;
+  source_hint?: string;
+  gameplay?: ChoiceGameplay;
+}
+
+export interface InvestigationClueUi {
+  id: string;
+  label: string;
+  found: boolean;
+}
+
+export interface BoardInteraction {
+  id: string;
+  label: string;
+  short_label: string;
+  category: string;
+  entity_id: string;
+  unlocked: boolean;
+  locked: boolean;
+  lock_reason?: string | null;
+  is_new?: boolean;
+  intent?: Record<string, unknown>;
+}
+
+export interface BoardEntity {
+  id: string;
+  kind: "npc" | "location";
+  name: string;
+  subtitle: string;
+  location?: string;
+  interaction_count: number;
+  unlocked_count: number;
+  interactions: BoardInteraction[];
+}
+
+export interface InvestigationBoard {
+  entities: BoardEntity[];
+  category_labels: Record<string, string>;
+  mode?: string;
+}
+
+export interface InvestigationUi {
+  remaining_turns: number;
+  max_turns: number;
+  stamina: number;
+  crisis_pressure: number;
+  thomas_trust: number;
+  elena_trust: number;
+  mira_trust: number;
+  thomas_suspicion: number;
+  clues_found: number;
+  clues_total: number;
+  clues: InvestigationClueUi[];
+  chapter_complete?: boolean;
+  guidance?: string;
+  board?: InvestigationBoard;
 }
 
 export interface NarrativeBlock {

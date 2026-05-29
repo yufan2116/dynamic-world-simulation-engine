@@ -1,4 +1,5 @@
 import type { GameEventItem, GameState } from "../types";
+import { polishNarrativeText } from "./formatNarrative";
 
 export interface FeedItem {
   id: string;
@@ -25,7 +26,7 @@ export function buildWorldEventFeed(
     items.push({
       id: uid(),
       category: "rumor",
-      text: r.text,
+      text: polishNarrativeText(r.text),
     });
   }
 
@@ -37,14 +38,14 @@ export function buildWorldEventFeed(
         items.push({
           id: uid(),
           category: "npc",
-          text: `${npc.name}：${npc.memories[npc.memories.length - 1]}`,
+          text: polishNarrativeText(`${npc.name}：${npc.memories[npc.memories.length - 1]}`),
         });
       }
     }
   }
 
   for (const note of crisisNotes.slice(-3)) {
-    items.push({ id: uid(), category: "crisis", text: note });
+    items.push({ id: uid(), category: "crisis", text: polishNarrativeText(note) });
   }
 
   for (const ev of dbEvents.slice(-12).reverse()) {

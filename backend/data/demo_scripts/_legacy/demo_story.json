@@ -1,0 +1,152 @@
+{
+  "id": "missing_merchant_demo",
+  "chapter": { "number": 1, "title": "失踪的商人" },
+  "prologue_html": "<p>雨后的雷文福德笼罩在灰蓝色的晨光里。失踪商人马库斯的名字，正在村口被一遍遍提起。</p>",
+  "initial_step": "step_opening",
+  "steps": {
+    "step_opening": {
+      "step": 1,
+      "narrative_html": "<p class=\"chapter-epigraph\">失踪的商人</p><p>雾散了。雷文福德村口就在眼前：木栅、火把、守卫<strong>托马斯</strong>紧皱的眉头。</p><p>广场中央，<strong>艾琳娜</strong>裙摆沾泥，声音发颤：</p><p class=\"dialogue\">「求求你们……我父亲昨晚没有回来！他是商人马库斯——」</p><p>酒馆方向的灯火在风里摇晃，老板娘<strong>米拉</strong>站在门帘后，神色惊忧。</p>",
+      "choice_transition": "你可以从下列行动开始调查——",
+      "options": [
+        {
+          "id": "demo_opt_elena",
+          "label": "[交涉] 询问艾琳娜父亲最后去向",
+          "input": "询问艾琳娜父亲最后去向",
+          "category": "social",
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「询问艾琳娜父亲最后去向」</strong></p><p class=\"result\">艾琳娜哽咽着说：父亲昨夜答应去<strong>仓库</strong>清点货物，雨太大，再也没回来。</p>",
+            "dice": { "ability": "WIS", "dc": 10, "roll": 14, "modifier": 2, "total": 16, "outcome": "success" },
+            "clue_id": "clue_elena_last_seen",
+            "pressure_delta": 8,
+            "next_step": "step_investigate"
+          }
+        },
+        {
+          "id": "demo_opt_thomas",
+          "label": "[交涉] 询问托马斯昨夜巡逻",
+          "input": "询问托马斯昨夜巡逻情况",
+          "category": "social",
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「询问托马斯昨夜巡逻情况」</strong></p><p class=\"result\">托马斯压低声音：昨夜<strong>旧仓库方向</strong>有人影，他已加派哨岗，但上面不让声张。</p>",
+            "dice": { "ability": "CHA", "dc": 12, "roll": 11, "modifier": 1, "total": 12, "outcome": "success" },
+            "clue_id": "clue_patrol_anomaly",
+            "pressure_delta": 10,
+            "next_step": "step_investigate"
+          }
+        },
+        {
+          "id": "demo_opt_gate",
+          "label": "[感知] 检查村口泥地痕迹",
+          "input": "检查村口泥地痕迹",
+          "category": "investigate",
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「检查村口泥地痕迹」</strong></p><p class=\"result\">泥地里留着车辙与凌乱脚印，方向指向<strong>黑森林</strong>，边缘有拖拽痕迹。</p>",
+            "dice": { "ability": "WIS", "dc": 11, "roll": 15, "modifier": 2, "total": 17, "outcome": "success" },
+            "clue_id": "clue_muddy_tracks",
+            "pressure_delta": 8,
+            "next_step": "step_investigate"
+          }
+        }
+      ]
+    },
+    "step_investigate": {
+      "step": 2,
+      "narrative_html": "<p class=\"scene\">雨势稍歇。村民的目光仍追着你的脚步——每一条线索都在把马库斯推向黑森林。</p>",
+      "choice_transition": "你还有时间继续追查——",
+      "options": [
+        {
+          "id": "demo_opt_mira",
+          "label": "[交涉] 在酒馆向米拉打听",
+          "input": "在酒馆向米拉打听消息",
+          "category": "social",
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「在酒馆向米拉打听」</strong></p><p class=\"result\">米拉凑近你：她看见<strong>守卫深夜调动</strong>，马库斯最后一趟也往仓库方向去了。</p>",
+            "dice": { "ability": "CHA", "dc": 11, "roll": 13, "modifier": 1, "total": 14, "outcome": "success" },
+            "clue_id": "clue_mira_saw_guard",
+            "pressure_delta": 10,
+            "next_step": "step_pressure"
+          }
+        },
+        {
+          "id": "demo_opt_warehouse",
+          "label": "[感知] 搜查仓库可疑木箱",
+          "input": "搜查仓库可疑木箱",
+          "category": "investigate",
+          "requires_clues": ["clue_elena_last_seen"],
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「搜查仓库可疑木箱」</strong></p><p class=\"result\">木箱边沿有新鲜撬痕，内里空无一物——像有人匆忙运走了货物。</p>",
+            "dice": { "ability": "WIS", "dc": 12, "roll": 10, "modifier": 2, "total": 12, "outcome": "success" },
+            "clue_id": "clue_suspicious_crate",
+            "pressure_delta": 12,
+            "next_step": "step_pressure"
+          }
+        },
+        {
+          "id": "demo_opt_thomas_follow",
+          "label": "[交涉] 追问托马斯仓库异常",
+          "input": "追问托马斯仓库方向的异常",
+          "category": "social",
+          "requires_clues": ["clue_patrol_anomaly"],
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「追问托马斯仓库方向的异常」</strong></p><p class=\"result\">托马斯翻出值班簿：马库斯昨夜签过登记，之后便再无记录。</p>",
+            "dice": { "ability": "CHA", "dc": 13, "roll": 14, "modifier": 1, "total": 15, "outcome": "success" },
+            "clue_id": "clue_merchant_records",
+            "pressure_delta": 8,
+            "next_step": "step_pressure"
+          }
+        }
+      ]
+    },
+    "step_pressure": {
+      "step": 3,
+      "narrative_html": "<p class=\"world\">远处传来急促的哨声，黑森林里的局势正在恶化。你必须做出抉择。</p>",
+      "choice_transition": "时间所剩无几——",
+      "options": [
+        {
+          "id": "demo_opt_forest",
+          "label": "[行动] 前往黑森林追踪下落",
+          "input": "前往黑森林追踪马库斯下落",
+          "category": "survival",
+          "requires_clues_min": 3,
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「前往黑森林追踪下落」</strong></p><p class=\"result\">你沿脚印深入黑森林，在营地边缘发现了被押送的马库斯——绑匪尚未撤离。</p>",
+            "ending_id": "ending_rescue"
+          }
+        },
+        {
+          "id": "demo_opt_wait",
+          "label": "[行动] 再观望一轮",
+          "input": "在村口观望局势",
+          "category": "survival",
+          "result": {
+            "narrative_html": "<p class=\"player-action\">你选择：<strong>「在村口观望局势」</strong></p><p class=\"scene\">村民渐渐散去，官方的搜寻宣告结束。马库斯的下落被埋进雨声里。</p>",
+            "ending_id": "ending_buried"
+          }
+        }
+      ]
+    }
+  },
+  "endings": {
+    "ending_rescue": {
+      "title": "救出马库斯",
+      "subtitle": "你在危机爆发前闯入了森林营地",
+      "epigraph": "结局 A · 救援成功",
+      "narrative_html": "<div class=\"chapter-ending\"><p class=\"chapter-epigraph\">结局 A · 救援成功</p><h2 class=\"ending-title\">救出马库斯</h2><p class=\"ending-subtitle\"><em>你在危机爆发前闯入了森林营地</em></p><p>绑匪尚未撤离。马库斯被麻绳捆在货箱后，意识模糊却仍活着。</p><p class=\"dialogue\">「我以为……再也见不到艾琳娜了。」</p><p>你把商人带回村口。艾琳娜扑进父亲怀里，托马斯向你正式敬礼。</p></div>"
+    },
+    "ending_buried": {
+      "title": "真相被掩盖",
+      "subtitle": "村庄选择遗忘",
+      "epigraph": "结局 C · 调查无果",
+      "narrative_html": "<div class=\"chapter-ending\"><p class=\"chapter-epigraph\">结局 C · 调查无果</p><h2 class=\"ending-title\">真相被掩盖</h2><p class=\"ending-subtitle\"><em>回合耗尽，村庄选择遗忘</em></p><p>托马斯宣布搜寻结束，米拉关上了酒馆后堂的门。雷文福德恢复平静——平静得像马库斯从未存在过。</p></div>"
+    }
+  },
+  "clue_labels": {
+    "clue_elena_last_seen": "艾琳娜：父亲昨夜去了仓库",
+    "clue_patrol_anomaly": "托马斯：昨夜巡逻异常",
+    "clue_muddy_tracks": "村口：泥泞脚印指向黑森林",
+    "clue_mira_saw_guard": "米拉：看见守卫深夜调动",
+    "clue_suspicious_crate": "仓库：可疑木箱撬痕",
+    "clue_merchant_records": "商队记录：马库斯昨夜登记"
+  }
+}

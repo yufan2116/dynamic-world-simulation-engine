@@ -4,17 +4,16 @@ function stripTags(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
 }
 
-/** 仅对世界/后果/选项显示分类标签，其余自然流动 */
-export const SHOW_BEAT_LABEL: Set<NarrativeBlockKind> = new Set([
-  "world",
-  "consequence",
-  "choices",
-]);
+/** 玩家主 UI 不显示系统分类标签（调试信息见 Inspector） */
+export const SHOW_BEAT_LABEL: Set<NarrativeBlockKind> = new Set([]);
 
 function classifyParagraph(el: Element): { kind: NarrativeBlockKind; speaker?: string } {
   const cls = el.className || "";
   const text = stripTags(el.innerHTML);
 
+  if (cls.includes("player-action")) {
+    return { kind: "player-action" };
+  }
   if (cls.includes("choice-transition") || cls.includes("choice-prompt")) {
     return { kind: "choices" };
   }
@@ -25,7 +24,7 @@ function classifyParagraph(el: Element): { kind: NarrativeBlockKind; speaker?: s
     return { kind: "result" };
   }
   if (cls.includes("consequence")) {
-    return { kind: "consequence" };
+    return { kind: "scene" };
   }
   if (cls.includes("world")) {
     return { kind: "world" };
@@ -76,6 +75,7 @@ function parseChoicesFromDom(root: Element): InlineChoice[] {
   items.forEach((li) => {
     const id = li.getAttribute("data-choice-id") || "";
     const input = li.getAttribute("data-input") || "";
+    const intentJson = li.getAttribute("data-intent") || "";
     const isFree = li.getAttribute("data-free") === "true";
     const text = stripTags(li.querySelector(".choice-text")?.innerHTML || li.innerHTML);
     choices.push({
@@ -83,6 +83,7 @@ function parseChoicesFromDom(root: Element): InlineChoice[] {
       text,
       input,
       is_free: isFree,
+      intent_payload: intentJson ? (JSON.parse(intentJson) as unknown) : undefined,
     });
   });
   return choices;

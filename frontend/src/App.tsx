@@ -20,6 +20,7 @@ import { fetchGameState, fetchTemplates, loadWorldTemplate, startDemoGame, start
 import { extractChoicesFromHtml } from "./lib/parseNarrative";
 import { applyUiTheme } from "./lib/worldTheme";
 import type { UiTheme } from "./types";
+import { getOntologyFromState, uiTerm } from "./lib/ontology";
 
 import ActionBar from "./components/ActionBar";
 
@@ -33,6 +34,9 @@ import NarrativeFeed from "./components/NarrativeFeed";
 
 import SceneBanner from "./components/SceneBanner";
 import SceneNpcStrip from "./components/SceneNpcStrip";
+
+import DebugInspector from "./components/DebugInspector";
+import ChapterComplete from "./components/ChapterComplete";
 
 import TemplateSelect from "./components/TemplateSelect";
 
@@ -62,6 +66,7 @@ import type {
   NarrativeLogEntry,
   InlineChoice,
   StoryEntry,
+  SessionSummary,
   WorldTemplateInfo,
 } from "./types";
 
@@ -261,9 +266,9 @@ function applyImagePayload(
 
   const portrait =
     isUsableImageUrl(data.portrait_url) ? data.portrait_url : data.world_state?.player?.portrait_url;
-  if (isUsableImageUrl(portrait)) setters.setPortraitUrl(portrait);
+  if (isUsableImageUrl(portrait)) setters.setPortraitUrl(portrait ?? null);
 
-  if (isUsableImageUrl(data.background_url)) setters.setBackgroundUrl(data.background_url);
+  if (isUsableImageUrl(data.background_url)) setters.setBackgroundUrl(data.background_url ?? null);
 
   const merged = mergePortraitMaps(data.npc_portraits, data.image_entities);
   if (Object.keys(merged).length > 0) {
@@ -291,7 +296,7 @@ export default function App() {
   const [templates, setTemplates] = useState<WorldTemplateInfo[]>([]);
 
   const [templateId, setTemplateId] = useState("medieval_dark_fantasy");
-  const [uiTheme, setUiTheme] = useState<UiTheme | null>(null);
+  const [, setUiTheme] = useState<UiTheme | null>(null);
 
   const [worldState, setWorldState] = useState<GameState | null>(null);
 
@@ -299,7 +304,7 @@ export default function App() {
 
   const [gameEvents, setGameEvents] = useState<GameEventItem[]>([]);
 
-  const [availableActions, setAvailableActions] = useState<AvailableActions | null>(null);
+  const [, setAvailableActions] = useState<AvailableActions | null>(null);
 
   const [input, setInput] = useState("");
 
@@ -327,6 +332,10 @@ export default function App() {
   );
 
   const [inPrologue, setInPrologue] = useState(false);
+  const [showInspector, setShowInspector] = useState(false);
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
+  const [chapterComplete, setChapterComplete] = useState(false);
+  const [gameMode, setGameMode] = useState<"random" | "demo">("random");
 
   const prologueBannerTimerRef = useRef<number | null>(null);
 
@@ -603,10 +612,23 @@ export default function App() {
         setInPrologue(false);
       }
 
-      if (!data.inline_choices?.length) {
-        await syncChoicesFromServer();
+      if (data.game_mode === "demo") {
+        setGameMode("demo");
+      } else {
+        setGameMode("random");
+        if (!data.inline_choices?.length) {
+          await syncChoicesFromServer();
+        }
       }
       await refreshEvents();
+
+      if (data.chapter_complete && data.session_summary) {
+        setChapterComplete(true);
+        setSessionSummary(data.session_summary);
+      } else {
+        setChapterComplete(false);
+        setSessionSummary(null);
+      }
     },
     [templateId, refreshEvents],
   );
@@ -620,6 +642,9 @@ export default function App() {
     setInitError(null);
 
     setImageProgress(null);
+    setChapterComplete(false);
+    setSessionSummary(null);
+    setGameMode("random");
 
     try {
 
@@ -661,6 +686,9 @@ export default function App() {
     setLoading(true);
     setInitError(null);
     setImageProgress(null);
+    setChapterComplete(false);
+    setSessionSummary(null);
+    setGameMode("demo");
     try {
       const data = await startDemoGame();
       setTemplateId(data.template_id || "medieval_dark_fantasy");
@@ -687,6 +715,11 @@ export default function App() {
           applyImagePayload(state, imageSetters);
           if (state.events?.length) setGameEvents(state.events);
           if (state.crisis_state) setCrisisState(state.crisis_state);
+          if (state.game_mode === "demo") setGameMode("demo");
+          if (state.chapter_complete && state.session_summary) {
+            setChapterComplete(true);
+            setSessionSummary(state.session_summary);
+          }
           if (state.available_actions) setAvailableActions(state.available_actions);
 
           if (state.narrative_history?.length) {
@@ -746,11 +779,33 @@ export default function App() {
 
 
 
-  const handleAction = async (text: string) => {
-
+  const handleAction = async (text: string, choice?: InlineChoice) => {
     const trimmed = text.trim();
+    const intentObj =
+      choice?.intent_payload && typeof choice.intent_payload === "object"
+        ? (choice.intent_payload as Record<string, unknown>)
+        : null;
+    const intentTarget =
+      typeof intentObj?.target === "string" && intentObj.target.startsWith("inv_")
+        ? intentObj.target
+        : undefined;
+    const choiceId =
+      choice && !choice.is_free && choice.id && choice.id !== "free_input"
+        ? choice.id.trim()
+        : undefined;
+    const intentActionId =
+      typeof intentObj?.action_id === "string" && intentObj.action_id.trim()
+        ? intentObj.action_id.trim()
+        : undefined;
 
-    if (!trimmed || loading) return;
+    const actionId =
+      choiceId ||
+      intentActionId ||
+      (choice?.id?.startsWith("inv_") ? choice.id : undefined) ||
+      intentTarget;
+
+    if (!actionId && (!trimmed || loading || chapterComplete)) return;
+    if (actionId && (loading || chapterComplete)) return;
 
     setLoading(true);
 
@@ -758,7 +813,22 @@ export default function App() {
 
     try {
 
-      const data = await submitAction(trimmed);
+      const selectedText = choice?.text?.trim();
+      const intentPayload =
+        choice && !choice.is_free && actionId
+          ? {
+              ...(intentObj && typeof intentObj === "object" ? intentObj : {}),
+              action_id: actionId,
+              mode: "demo_script",
+            }
+          : undefined;
+      const payloadInput = actionId ? "" : trimmed; // 点击选项不走 parser
+      const data = await submitAction(
+        payloadInput,
+        selectedText ? selectedText : undefined,
+        actionId,
+        intentPayload
+      );
 
       setWorldState(data.world_state);
 
@@ -786,6 +856,14 @@ export default function App() {
 
       if (data.dice_roll_info) setShowDice(data.dice_roll_info);
 
+      if (data.crisis_state) setCrisisState(data.crisis_state);
+
+      if (data.chapter_complete && data.session_summary) {
+        setChapterComplete(true);
+        setSessionSummary(data.session_summary);
+      }
+
+      if (data.game_mode === "demo") setGameMode("demo");
       if (!data.inline_choices?.length) {
         await syncChoicesFromServer();
       } else {
@@ -812,7 +890,7 @@ export default function App() {
 
   };
 
-
+  const isDemoPlay = gameMode === "demo" && !chapterComplete;
 
   const chapterDisplay =
 
@@ -822,9 +900,22 @@ export default function App() {
     document.getElementById("free-action-input")?.focus();
   }, []);
 
+  const freeInputPlaceholder = useMemo(() => {
+    const tid = String(worldState?.flags?.template_id ?? templateId);
+    if (tid.includes("xianxia")) {
+      return "例如：我以符箓探路，向玄尘道人打听结界裂痕";
+    }
+    return "例如：我假装喝醉，靠近守卫听他们谈话";
+  }, [worldState?.flags, templateId]);
+
+  const freeInputHint = useMemo(() => {
+    const onto = getOntologyFromState(worldState);
+    return uiTerm(onto, "free_action_hint", "自由行动 · 在上方选择，或自行描述");
+  }, [worldState]);
+
   return (
 
-    <div className="min-h-screen flex flex-col p-2 md:p-3 max-w-[1800px] mx-auto gap-2">
+    <div className="h-dvh max-h-dvh flex flex-col p-2 md:p-3 max-w-[1800px] mx-auto gap-2 overflow-hidden">
 
       <header className="text-center py-0.5 opacity-50 shrink-0">
 
@@ -856,93 +947,84 @@ export default function App() {
 
 
 
-      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[minmax(200px,228px)_minmax(0,1fr)_minmax(248px,288px)] gap-2 md:gap-3 min-h-0">
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[minmax(200px,228px)_minmax(0,1fr)_minmax(248px,288px)] gap-2 md:gap-3 min-h-0 overflow-y-auto xl:overflow-hidden items-stretch">
 
-        <aside className="hidden xl:flex flex-col gap-2 min-h-[calc(100vh-5rem)]">
-
+        <aside className="hidden xl:flex flex-col gap-2 min-h-0 overflow-hidden xl:sticky xl:top-2 xl:self-start xl:max-h-[calc(100dvh-7rem)]">
           {templates.length > 0 && (
-
             <div className="rounded-lg border border-fantasy-border bg-fantasy-panel/80 p-2 shrink-0">
-
               <TemplateSelect
-
                 templates={templates}
-
                 selectedId={templateId}
-
                 onSelect={(id) => void switchTemplate(id)}
-
                 disabled={loading}
-
               />
-
             </div>
-
           )}
-
-          <div className="flex-1 min-h-0">
-
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <CharacterPanel
-
               player={worldState?.player ?? null}
-
               portraitUrl={portraitUrl}
-
               onPortraitChange={handlePortraitChange}
-
             />
-
           </div>
-
         </aside>
 
 
 
-        <main className="flex flex-col min-h-[calc(100vh-5rem)] gap-2 min-w-0 grid grid-rows-[auto_auto_minmax(260px,1fr)_auto]">
+        <main className="flex min-h-0 flex-1 flex-col gap-2 min-w-0 overflow-hidden">
 
-          <ImageProgressBar
-            completed={displayProgress?.completed ?? 0}
-            total={displayProgress?.total ?? 0}
-            visible={showProgress}
-          />
-
-          {scene && (
-            <SceneBanner
-              scene={scene}
-              backgroundUrl={backgroundUrl}
-              chapterTitle={chapterDisplay}
-              prologueMode={inPrologue}
-              templateId={templateId}
+          <div className="flex shrink-0 flex-col gap-2">
+            <ImageProgressBar
+              completed={displayProgress?.completed ?? 0}
+              total={displayProgress?.total ?? 0}
+              visible={showProgress}
             />
+
+            {scene && (
+              <SceneBanner
+                scene={scene}
+                backgroundUrl={backgroundUrl}
+                chapterTitle={chapterDisplay}
+                prologueMode={inPrologue}
+                templateId={templateId}
+              />
+            )}
+          </div>
+
+          {scene && !inPrologue && (
+            <div className="shrink-0">
+              <SceneNpcStrip scene={scene} compact />
+            </div>
           )}
 
-          {scene && !inPrologue && <SceneNpcStrip scene={scene} />}
-
-          <div className="min-h-[260px] flex flex-col min-h-0 overflow-hidden">
+          <div id="adventure-log" className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <NarrativeFeed
               entries={story}
               loading={loading}
               disabled={loading}
-              onSelectChoice={(inp) => void handleAction(inp)}
+              onSelectChoice={(inp, choice) => void handleAction(inp, choice)}
               onFocusFreeInput={focusFreeInput}
             />
           </div>
 
-          <div className="sticky bottom-0 z-30 shrink-0 pb-1">
-            <ActionBar
-              value={input}
-              onChange={setInput}
-              onSubmit={() => void handleAction(input)}
-              disabled={loading}
-            />
-
+          <div className="z-30 shrink-0 pb-1">
+            {!isDemoPlay && (
+              <ActionBar
+                value={input}
+                onChange={setInput}
+                onSubmit={() => void handleAction(input)}
+                disabled={loading || chapterComplete}
+                placeholder={freeInputPlaceholder}
+                hintText={freeInputHint}
+              />
+            )}
           </div>
 
         </main>
 
 
 
-        <aside className="min-h-[280px] xl:min-h-[calc(100vh-5rem)]">
+        <aside className="min-h-[280px] xl:min-h-0 xl:overflow-hidden xl:sticky xl:top-2 xl:self-start xl:max-h-[calc(100dvh-7rem)] flex flex-col">
 
           <WorldPanel
 
@@ -951,6 +1033,7 @@ export default function App() {
             crisisState={crisisState}
 
             eventFeed={eventFeed}
+
 
           />
 
@@ -961,6 +1044,22 @@ export default function App() {
 
 
       <DiceOverlay dice={showDice} onClose={() => setShowDice(null)} />
+      <DebugInspector open={showInspector} onClose={() => setShowInspector(false)} />
+
+      {chapterComplete && sessionSummary && (
+        <ChapterComplete
+          summary={sessionSummary}
+          loading={loading}
+          onViewAdventureLog={() => {
+            setChapterComplete(false);
+            requestAnimationFrame(() => {
+              document.getElementById("adventure-log")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+          }}
+          onRestartDemo={() => void initDemoGame()}
+          onNewGame={() => void initGame(templateId)}
+        />
+      )}
 
 
 
@@ -1004,9 +1103,18 @@ export default function App() {
           >
             New Demo Game
           </button>
+          <span className="text-fantasy-border text-xs">|</span>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => setShowInspector(true)}
+            className="text-xs text-fantasy-muted hover:text-fantasy-gold underline"
+          >
+            Debug / Inspector
+          </button>
         </div>
         <p className="text-[10px] text-fantasy-muted/80">
-          Demo：Ravenford 失踪商人（稳定种子，剧情仍动态推进）
+          演示章节：预设叙事分支（New Demo Game）
         </p>
 
       </footer>

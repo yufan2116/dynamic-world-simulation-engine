@@ -222,6 +222,42 @@ def build_scene_graph(
             objects.append(tag)
 
     clock = state.flags.get("clock", state.time_of_day)
+    active_events: list[dict[str, Any]] = []
+    present_names = [n.name for n in state.npc_at_location()]
+    # 开场：艾琳娜求助（公开）
+    if state.flags.get("opening_scene") and state.location == "村口" and "艾琳娜" in present_names:
+        active_events.append(
+            {
+                "id": "elena_pleading",
+                "type": "npc_dialogue",
+                "participants": ["艾琳娜"],
+                "summary": "艾琳娜正在请求帮助寻找父亲",
+                "public": True,
+            }
+        )
+    # 托马斯加派哨岗（公开）
+    if state.flags.get("guard_patrol_active") and state.location in ("村口", "仓库") and "托马斯" in present_names:
+        active_events.append(
+            {
+                "id": "thomas_calling_extra_patrol",
+                "type": "npc_order",
+                "participants": ["托马斯", "守卫同伴"],
+                "summary": "托马斯正在召集同伴加派仓库方向哨岗",
+                "public": True,
+            }
+        )
+    # 守卫私下低声交谈（默认不生成，必须由系统显式标记）
+    if state.flags.get("guards_private_conversation") and state.location == "村口":
+        active_events.append(
+            {
+                "id": "guards_private_conversation",
+                "type": "npc_conversation",
+                "participants": ["守卫A", "守卫B"],
+                "summary": "两名守卫在角落低声交谈",
+                "public": False,
+            }
+        )
+
     return {
         "location": state.location,
         "time": f"第{state.day}天 {clock}（{state.time_of_day}）",
@@ -230,6 +266,7 @@ def build_scene_graph(
         "soundscape": meta.get("soundscape", []),
         "visible_npcs": visible,
         "interactive_objects": objects,
+        "active_events": active_events,
         "current_tension": _current_tension(state),
         "player_position": meta.get("player_position", f"{state.location}内"),
         "player_action_summary": intent.get("raw_input") or intent.get("action_type", ""),

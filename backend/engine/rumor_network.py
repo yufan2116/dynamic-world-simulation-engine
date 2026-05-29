@@ -6,6 +6,8 @@ from typing import Any
 
 from engine.world_ontology import is_xianxia, ontology_for_state, tension_value
 from engine.world_state import GameState
+from engine.world_state import ensure_player_known_facts
+from engine.player_knowledge import ensure_player_knowledge
 from engine.world_templates import location_connections_for_state
 
 
@@ -18,6 +20,25 @@ def _ensure_rumor_id(rumor: dict[str, Any]) -> str:
     return rid
 
 
+def _ensure_rumor_source(rumor: dict[str, Any]) -> None:
+    # 兼容旧字段：origin（传播起点）仍保留；禁止 location 作为玩家可见来源
+    origin = str(rumor.get("origin") or rumor.get("heard_at_location") or "村口")
+    rumor.setdefault("origin", origin)
+    st = str(rumor.get("source_type") or "").strip().lower()
+    if not st or st == "location":
+        rumor["source_type"] = "overheard_conversation"
+        rumor.setdefault("source_id", "villagers_whisper")
+        rumor.setdefault("source_label", "低声交谈的村民")
+    else:
+        rumor.setdefault("source_type", st)
+        rumor.setdefault("source_id", rumor.get("source_id") or origin)
+        rumor.setdefault("source_label", rumor.get("source_label") or rumor.get("source_id"))
+    rumor.setdefault("visibility", "local")  # public | local | discovered | hidden
+    rumor.setdefault("known_to_player", False)
+    rumor.setdefault("first_heard_turn", None)
+    rumor.setdefault("heard_at_location", None)
+
+
 def _ensure_rumors(state: GameState) -> list[dict[str, Any]]:
     raw = state.flags.get("rumors")
     if not isinstance(raw, list):
@@ -25,6 +46,7 @@ def _ensure_rumors(state: GameState) -> list[dict[str, Any]]:
     for rumor in raw:
         if isinstance(rumor, dict):
             _ensure_rumor_id(rumor)
+            _ensure_rumor_source(rumor)
     state.flags["rumors"] = raw
     return raw
 
@@ -36,6 +58,11 @@ def add_rumor(
     *,
     credibility: float = 0.7,
     known_by: list[str] | None = None,
+    source_type: str = "location",
+    source_id: str | None = None,
+    source_label: str | None = None,
+    visibility: str = "local",
+    known_to_player: bool = False,
 ) -> dict[str, Any]:
     rumors = _ensure_rumors(state)
     rumor = {
@@ -46,6 +73,13 @@ def add_rumor(
         "credibility": credibility,
         "known_by": known_by or [],
         "age_ticks": 0,
+        "source_type": source_type,
+        "source_id": source_id or origin,
+        "source_label": source_label or (source_id or origin),
+        "visibility": visibility,
+        "known_to_player": known_to_player,
+        "first_heard_turn": None,
+        "heard_at_location": None,
     }
     rumors.append(rumor)
     if len(rumors) > 20:
@@ -81,9 +115,38 @@ def tick_rumors(state: GameState) -> list[dict[str, Any]]:
             heard_key = f"heard_{rid}"
             if not state.flags.get(heard_key):
                 state.flags[heard_key] = True
+                # 标记为玩家已知（source-grounded）
+                rumor["known_to_player"] = True
+                rumor["heard_at_location"] = player_loc
+                turn = int(state.flags.get("last_turn", 1) or 1)
+                rumor["first_heard_turn"] = rumor.get("first_heard_turn") or turn
+                facts = ensure_player_known_facts(state)
+                known_rumors = facts.get("known_rumors") if isinstance(facts, dict) else []
+                entry = {
+                    "id": rid,
+                    "text": str(rumor.get("text", "")),
+                    "source_type": str(rumor.get("source_type", "npc")),
+                    "source_label": str(rumor.get("source_label", "")),
+                    "heard_at_turn": turn,
+                    "heard_at_location": player_loc,
+                }
+                if isinstance(known_rumors, list):
+                    if not any(isinstance(x, dict) and x.get("id") == rid for x in known_rumors):
+                        known_rumors.append(entry)
+                pk = ensure_player_knowledge(state)
+                if not any(isinstance(x, dict) and x.get("id") == rid for x in pk.get("rumors", [])):
+                    pk["rumors"].append(
+                        {
+                            "id": rid,
+                            "text": entry["text"],
+                            "source": entry["source_label"],
+                            "source_type": entry["source_type"],
+                            "source_label": entry["source_label"],
+                        }
+                    )
                 events.append({
                     "type": "rumor",
-                    "text": f"【传闻·{player_loc}】{rumor.get('text', '')}",
+                    "text": f"【传闻·{player_loc}】{rumor.get('source_label','')}：{rumor.get('text', '')}".strip("："),
                     "rumor_id": rid,
                 })
 
@@ -108,10 +171,29 @@ def tick_rumors(state: GameState) -> list[dict[str, Any]]:
 
     if not is_xianxia(state):
         if state.flags.get("warehouse_noise") and not state.flags.get("rumor_warehouse_noise"):
-            add_rumor(state, "有人说昨夜仓库有打斗声。", "仓库", credibility=0.6)
+            add_rumor(
+                state,
+                "昨夜村口外侧传来短促的撞击与脚步声。",
+                "村口",
+                credibility=0.6,
+                source_type="overheard_conversation",
+                source_id="night_watch",
+                source_label="夜间巡逻的守卫",
+                visibility="local",
+            )
             state.flags["rumor_warehouse_noise"] = True
         if state.flags.get("bandit_raid") and not state.flags.get("rumor_bandit_raid"):
-            add_rumor(state, "强盗袭击了仓库外围，守卫伤亡不明。", "村口", credibility=0.85)
+            add_rumor(
+                state,
+                "仓库外围发生冲突，守卫伤亡情况不明。",
+                "村口",
+                credibility=0.85,
+                source_type="event",
+                source_id="guard_report",
+                source_label="守卫通报",
+                visibility="public",
+                known_to_player=True,
+            )
             state.flags["rumor_bandit_raid"] = True
 
     return events[:2]

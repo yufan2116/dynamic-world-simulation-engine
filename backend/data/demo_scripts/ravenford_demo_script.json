@@ -1,0 +1,241 @@
+{
+  "id": "ravenford_demo",
+  "title": "失踪的商人",
+  "chapter": { "number": 1, "title": "失踪的商人" },
+  "choice_transition": "雨后的雷文福德仍在等待你的调查——",
+  "opening": {
+    "blocks": [
+      { "type": "scene", "text": "雨后的雷文福德笼罩在灰蓝色晨光里。木栅、火把、守卫托马斯紧皱眉头。" },
+      { "type": "dialogue", "speaker": "艾琳娜", "text": "求求你们……我父亲昨晚没有回来！他是商人马库斯——" },
+      { "type": "scene", "text": "广场泥水未干，村民的目光追着你的脚步。" }
+    ]
+  },
+  "endings": {
+    "ending_good": {
+      "title": "马库斯获救",
+      "subtitle": "你在黑森林找到了被绑的商人。",
+      "epigraph": "雷文福德的雾散了。",
+      "blocks": [
+        { "type": "scene", "text": "瓦里克丢下武器退入雾中。马库斯被解开绳索，踉跄扑向艾琳娜。" },
+        { "type": "result", "text": "失踪的商人平安归来。" }
+      ]
+    },
+    "ending_bad": {
+      "title": "误入陷阱",
+      "subtitle": "你贸然闯入黑森林，落入了埋伏。",
+      "epigraph": "火把在泥地里熄灭。",
+      "blocks": [
+        { "type": "scene", "text": "你刚踏入林间，脚下绳索猛然收紧。瓦里克的笑声从雾后传来。" },
+        { "type": "consequence", "text": "调查中断——线索不足便闯入黑森林。" }
+      ]
+    }
+  },
+  "nodes": {
+    "start": {
+      "choices": [
+        {
+          "id": "ask_elena_last_seen",
+          "label": "[交涉] 安慰艾琳娜，询问她父亲最后去了哪里",
+          "next": "after_ask_elena_last_seen"
+        },
+        {
+          "id": "observe_thomas",
+          "label": "[感知] 观察托马斯的反应与举止",
+          "next": "after_observe_thomas"
+        },
+        {
+          "id": "inspect_mud",
+          "label": "[感知] 检查村口泥地痕迹",
+          "next": "after_inspect_mud"
+        },
+        {
+          "id": "ask_mira",
+          "label": "[社交] 前往酒馆，向米拉打听消息",
+          "next": "after_ask_mira"
+        }
+      ]
+    },
+    "after_ask_elena_last_seen": {
+      "player_action": "你选择：「安慰艾琳娜，询问她父亲最后去了哪里。」",
+      "dice": { "label": "交涉检定", "ability": "CHA", "roll": 14, "modifier": 1, "total": 15, "dc": 12, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "艾琳娜攥着裙摆，努力让自己冷静下来。" },
+        { "type": "scene", "text": "艾琳娜努力回忆着。" },
+        { "type": "dialogue", "speaker": "艾琳娜", "text": "父亲出门前一直念叨着那批货……他说必须今晚确认清楚，不能耽误商队启程。" },
+        { "type": "dialogue", "speaker": "艾琳娜", "text": "之后就再也没有回来。" },
+        { "type": "note", "text": "你将这句话记在调查笔记上。" },
+        { "type": "clue", "text": "马库斯失踪前曾提到一批需要连夜确认的货物" }
+      ],
+      "notebook": ["马库斯失踪前提到一批需要连夜确认的货物"],
+      "status": { "clues": 1, "crisis_pressure": 25, "elena_trust": 1 },
+      "choices": [
+        { "id": "ask_elena_cargo", "label": "[交涉] 追问艾琳娜：那批货是什么", "next": "after_ask_elena_cargo" },
+        { "id": "ask_thomas_last_seen", "label": "[交涉] 向托马斯求证：昨夜是否见过马库斯", "next": "after_ask_thomas_last_seen" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" }
+      ]
+    },
+    "after_ask_elena_cargo": {
+      "player_action": "你选择：「追问艾琳娜：那批货是什么。」",
+      "dice": { "label": "交涉检定", "ability": "CHA", "roll": 12, "modifier": 1, "total": 13, "dc": 11, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "艾琳娜深吸一口气，像是终于抓住了某个具体的锚点。" },
+        { "type": "dialogue", "speaker": "艾琳娜", "text": "是商队订的布匹与铁器……父亲说必须连夜清点入库，一件都不能错。" },
+        { "type": "note", "text": "你在笔记上补了一笔：货物与仓库直接相关。" },
+        { "type": "clue", "text": "货物为布匹与铁器，须连夜清点入库" }
+      ],
+      "notebook": ["货物为布匹与铁器，须连夜清点入库"],
+      "status": { "clues": 1, "crisis_pressure": 28 },
+      "choices": [
+        { "id": "ask_thomas_last_seen", "label": "[交涉] 向托马斯求证：昨夜是否见过马库斯", "next": "after_ask_thomas_last_seen" },
+        { "id": "go_warehouse", "label": "[感知] 前往仓库调查", "next": "after_go_warehouse" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" }
+      ]
+    },
+    "after_observe_thomas": {
+      "player_action": "你选择：「观察托马斯的反应与举止。」",
+      "dice": { "label": "感知检定", "ability": "WIS", "roll": 13, "modifier": 2, "total": 15, "dc": 11, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "托马斯站在木栅旁，目光反复扫向仓库小路，指节因握紧剑柄而发白。" },
+        { "type": "result", "text": "他神色紧张，像在隐瞒什么，却又不便当众开口。" },
+        { "type": "clue", "text": "托马斯对仓库方向格外戒备" }
+      ],
+      "notebook": ["托马斯对仓库方向格外戒备"],
+      "status": { "clues": 1, "crisis_pressure": 24 },
+      "choices": [
+        { "id": "ask_thomas_last_seen", "label": "[交涉] 向托马斯求证：昨夜是否见过马库斯", "next": "after_ask_thomas_last_seen" },
+        { "id": "ask_thomas_why_warehouse", "label": "[交涉] 追问托马斯：为何对仓库方向如此紧张", "next": "after_ask_thomas_patrol" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" }
+      ]
+    },
+    "after_ask_thomas_last_seen": {
+      "player_action": "你选择：「向托马斯求证：昨夜是否见过马库斯。」",
+      "dice": { "label": "交涉检定", "ability": "CHA", "roll": 11, "modifier": 1, "total": 12, "dc": 12, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "你转向托马斯，把艾琳娜的说法简要复述了一遍。" },
+        { "type": "scene", "text": "守卫长沉默片刻，才缓缓开口。" },
+        { "type": "dialogue", "speaker": "托马斯", "text": "我见过马库斯。" },
+        { "type": "dialogue", "speaker": "托马斯", "text": "昨晚大概二更天，他驾着马车往仓库去了。当时还下着雨，我记得很清楚。" },
+        { "type": "scene", "text": "托马斯皱起眉。" },
+        { "type": "dialogue", "speaker": "托马斯", "text": "后来他没再回来。" },
+        { "type": "result", "text": "这与艾琳娜的说法完全一致。" },
+        { "type": "clue_confirm", "text": "马库斯昨夜确实前往仓库" }
+      ],
+      "notebook": ["托马斯证实：昨夜二更天马库斯驾车往仓库去"],
+      "status": { "clues": 1, "crisis_pressure": 32, "thomas_trust": 1 },
+      "choices": [
+        { "id": "ask_thomas_why_warehouse", "label": "[交涉] 追问托马斯：为何当时没有阻拦马库斯", "next": "after_ask_thomas_patrol" },
+        { "id": "go_warehouse", "label": "[感知] 前往仓库调查", "next": "after_go_warehouse" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" }
+      ]
+    },
+    "after_ask_thomas_patrol": {
+      "player_action": "你选择：「追问托马斯：为何当时没有阻拦马库斯。」",
+      "dice": { "label": "交涉检定", "ability": "CHA", "roll": 10, "modifier": 1, "total": 11, "dc": 13, "result": "failure" },
+      "blocks": [
+        { "type": "scene", "text": "托马斯脸色一沉，声音压得更低。" },
+        { "type": "dialogue", "speaker": "托马斯", "text": "上面下令不许声张。旧仓库方向昨夜有人影，我只能加派哨岗——拦不住马库斯，也拦不住那些运货的人。" },
+        { "type": "note", "text": "你记下：仓库方向昨夜有人影，且守卫奉命保密。" },
+        { "type": "clue", "text": "昨夜旧仓库方向有人影，托马斯奉命加派哨岗" }
+      ],
+      "notebook": ["昨夜旧仓库方向有人影，托马斯奉命加派哨岗"],
+      "status": { "clues": 1, "crisis_pressure": 38 },
+      "choices": [
+        { "id": "go_warehouse", "label": "[感知] 前往仓库调查", "next": "after_go_warehouse" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" },
+        {
+          "id": "go_forest",
+          "label": "[生存] 沿泥地痕迹前往黑森林",
+          "branch": { "min_clues": 4, "good": "after_go_forest_good", "bad": "after_go_forest_bad" }
+        }
+      ]
+    },
+    "after_inspect_mud": {
+      "player_action": "你选择：「检查村口泥地痕迹。」",
+      "dice": { "label": "感知检定", "ability": "WIS", "roll": 16, "modifier": 2, "total": 18, "dc": 11, "result": "success" },
+      "blocks": [
+        { "type": "thought", "text": "仓库是马库斯最后出现的地点。如果他离开仓库后失踪，那么仓库附近应该还能留下痕迹——" },
+        { "type": "scene", "text": "你蹲在泥地边，膝盖沾满冰冷的泥水。" },
+        { "type": "result", "text": "雨水已经冲淡了大部分痕迹，但你仍从混乱的车辙中发现异常。" },
+        { "type": "result", "text": "其中一组车轮印并未返回村庄，而是径直延伸向黑森林方向。旁边还有被重物拖拽过的浅痕。" },
+        { "type": "clue", "text": "泥地车辙延伸向黑森林，沿途有拖拽痕迹" }
+      ],
+      "notebook": ["泥地车辙延伸向黑森林，沿途有拖拽痕迹"],
+      "status": { "clues": 1, "crisis_pressure": 35 },
+      "choices": [
+        { "id": "go_warehouse", "label": "[感知] 前往仓库调查", "next": "after_go_warehouse" },
+        { "id": "ask_mira", "label": "[社交] 前往酒馆，向米拉打听消息", "next": "after_ask_mira" },
+        {
+          "id": "go_forest",
+          "label": "[生存] 沿泥地痕迹前往黑森林",
+          "branch": { "min_clues": 4, "good": "after_go_forest_good", "bad": "after_go_forest_bad" }
+        }
+      ]
+    },
+    "after_ask_mira": {
+      "player_action": "你选择：「前往酒馆，向米拉打听消息。」",
+      "dice": { "label": "交涉检定", "ability": "CHA", "roll": 13, "modifier": 1, "total": 14, "dc": 11, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "酒馆里炉火噼啪作响，米拉把你拉到角落，声音压得很低。" },
+        { "type": "dialogue", "speaker": "米拉", "text": "我看见守卫深夜调动——不是寻常换岗那种。" },
+        { "type": "dialogue", "speaker": "米拉", "text": "马库斯最后一趟，也是往仓库方向去的。雨那么大，我忘不了那辆马车。" },
+        { "type": "clue", "text": "守卫深夜调动，马库斯最后前往仓库" }
+      ],
+      "notebook": ["米拉：守卫深夜调动，马库斯最后前往仓库"],
+      "status": { "clues": 1, "crisis_pressure": 34, "mira_trust": 1, "location": "酒馆" },
+      "choices": [
+        { "id": "go_warehouse", "label": "[感知] 前往仓库调查", "next": "after_go_warehouse" },
+        { "id": "inspect_mud", "label": "[感知] 检查村口泥地痕迹", "next": "after_inspect_mud" },
+        { "id": "ask_thomas_last_seen", "label": "[交涉] 向托马斯求证：昨夜是否见过马库斯", "next": "after_ask_thomas_last_seen" },
+        {
+          "id": "go_forest",
+          "label": "[生存] 沿泥地痕迹前往黑森林",
+          "branch": { "min_clues": 4, "good": "after_go_forest_good", "bad": "after_go_forest_bad" }
+        }
+      ]
+    },
+    "after_go_warehouse": {
+      "player_action": "你选择：「前往仓库调查。」",
+      "dice": { "label": "感知检定", "ability": "WIS", "roll": 14, "modifier": 2, "total": 16, "dc": 12, "result": "success" },
+      "blocks": [
+        { "type": "thought", "text": "艾琳娜与米拉都提到那批货——如果马库斯真是去确认货物，仓库里应该还留着什么。" },
+        { "type": "scene", "text": "仓库门虚掩，雨后的潮气混着铁锈味。几只木箱边沿留着新鲜撬痕。" },
+        { "type": "result", "text": "箱内空无一物，像有人匆忙运走了什么。" },
+        { "type": "clue", "text": "仓库货箱被撬空，似有人匆忙运走货物" }
+      ],
+      "notebook": ["仓库货箱被撬空，马库斯最后出现地点为仓库"],
+      "status": { "clues": 1, "crisis_pressure": 40, "location": "仓库" },
+      "choices": [
+        {
+          "id": "go_forest",
+          "label": "[生存] 沿车辙方向前往黑森林",
+          "branch": { "min_clues": 4, "good": "after_go_forest_good", "bad": "after_go_forest_bad" }
+        }
+      ]
+    },
+    "after_go_forest_good": {
+      "player_action": "你选择：「沿线索深入黑森林。」",
+      "dice": { "label": "感知检定", "ability": "WIS", "roll": 17, "modifier": 2, "total": 19, "dc": 13, "result": "success" },
+      "blocks": [
+        { "type": "scene", "text": "你沿足迹深入林间空地，在枯树下找到了被绑的马库斯。" },
+        { "type": "result", "text": "瓦里克退入雾中，马库斯跌跪在地。" }
+      ],
+      "ending_id": "ending_good",
+      "choices": []
+    },
+    "after_go_forest_bad": {
+      "player_action": "你选择：「贸然沿痕迹进入黑森林。」",
+      "dice": { "label": "敏捷检定", "ability": "DEX", "roll": 6, "modifier": 2, "total": 8, "dc": 14, "result": "failure" },
+      "blocks": [
+        { "type": "scene", "text": "你刚踏入林间，脚下绳索猛然收紧。" },
+        { "type": "result", "text": "瓦里克的笑声从雾后传来——你闯入了尚未摸清底细的陷阱。" }
+      ],
+      "ending_id": "ending_bad",
+      "choices": []
+    }
+  }
+}

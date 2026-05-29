@@ -5,9 +5,13 @@ from typing import Any
 
 from engine.crisis_escalation import record_investigation_progress, record_player_rest
 from engine.intent_parser import ParsedIntent
+from engine.location_registry import resolve_direction_phrase
+from engine.npc_interaction import resolve_npc_interaction
 from engine.npc_memory import update_npc_from_action
+from engine.text_sanitizer import sanitize_player_text
 from engine.rule_engine import DiceRollInfo, RollOutcome, outcome_succeeds
 from engine.world_state import GameState
+from engine.world_state import ensure_player_known_facts
 from engine.world_templates import all_locations_for_state, location_connections_for_state
 from engine.world_tick import advance_world_time
 
@@ -29,11 +33,12 @@ def apply_world_simulation(
     changes["check_succeeded"] = succeeded
 
     action = intent.action_type
-    minutes = 30
+    demo = bool(state.flags.get("vertical_slice_demo"))
+    minutes = 22 if demo else 30
     if action == "rest":
-        minutes = 480
+        minutes = 360 if demo else 480
     elif action == "move":
-        minutes = 45
+        minutes = 35 if demo else 45
     time_diff = advance_world_time(state, minutes)
     changes["time"] = time_diff
 
@@ -43,6 +48,9 @@ def apply_world_simulation(
         if dest in conns.get(state.location, []) or dest in all_locations_for_state(state):
             state.location = dest
             changes["moved_to"] = dest
+            facts = ensure_player_known_facts(state)
+            if dest not in facts["known_locations"]:
+                facts["known_locations"].append(dest)
             _set_active_npcs(state)
 
     elif action == "talk" and intent.target:
@@ -74,23 +82,50 @@ def apply_world_simulation(
                 if upd:
                     changes["npc_updates"].append(upd)
                 if target == "托马斯":
-                    if succeeded:
-                        state.flags["guard_info"] = True
-                        record_investigation_progress(state, 8)
-                        changes["clue"] = "守卫提及昨夜可疑人影与旧仓库"
-                    else:
+                    resolved = resolve_npc_interaction(
+                        state,
+                        "托马斯",
+                        intent.raw_input or "昨夜异常",
+                        succeeded=succeeded,
+                        raw_input=intent.raw_input or "",
+                    )
+                    changes["npc_answer"] = resolved.get("npc_answer")
+                    changes["npc_reaction"] = resolved.get("npc_reaction")
+                    changes["withheld_information"] = resolved.get("withheld_information")
+                    changes["no_new_information_reason"] = resolved.get("reason")
+                    revealed = resolved.get("revealed_fact")
+                    if isinstance(revealed, dict):
+                        record_investigation_progress(state, 8 if succeeded else 2)
+                        facts = ensure_player_known_facts(state)
+                        kf = facts.get("known_facts")
+                        if isinstance(kf, list):
+                            item = dict(revealed)
+                            item.setdefault("discovered_turn", int(state.flags.get("last_turn", 1) or 1))
+                            item.setdefault("discovered_at", str(state.location))
+                            if not any(
+                                isinstance(x, dict) and x.get("id") == item.get("id") for x in kf
+                            ):
+                                kf.append(item)
+                        changes["clue"] = str(revealed.get("label", ""))
+                    elif not succeeded:
                         state.flags["thomas_alerted"] = True
-                        upd2 = update_npc_from_action(
-                            state,
-                            "托马斯",
-                            memory="玩家偷听失败，托马斯高度警觉。",
-                            attitude_delta=-12,
-                        )
-                        if upd2:
-                            changes["npc_updates"].append(upd2)
                 if target == "米拉" and succeeded:
                     record_investigation_progress(state, 6)
                     changes["clue"] = "马库斯最后出现在仓库附近"
+                    facts = ensure_player_known_facts(state)
+                    facts["known_facts"].append(
+                        {
+                            "id": "clue_marcus_last_seen_near_warehouse",
+                            "type": "clue",
+                            "label": "马库斯最后出现在仓库附近",
+                            "visibility": "discovered",
+                            "source": "npc",
+                            "source_label": "米拉",
+                            "discovered_turn": int(state.flags.get("last_turn", 1) or 1),
+                            "discovered_at": str(state.location),
+                            "description": "米拉提到马库斯最后一趟的去向与仓库附近有关。",
+                        }
+                    )
                 if target == "艾琳娜":
                     if succeeded:
                         state.faction_reputation["村民"] = (
@@ -98,10 +133,30 @@ def apply_world_simulation(
                         )
                         changes["faction_changes"]["村民"] = "+5"
                         record_investigation_progress(state, 4)
+                        changes["npc_answer"] = "艾琳娜哽咽着说：父亲昨夜说要去清点货物，之后就再也没回来。"
+                        changes["npc_reaction"] = "她攥紧衣角，反复强调父亲从不夜不归宿。"
+                        facts = ensure_player_known_facts(state)
+                        pf = facts.get("player_facing_facts")
+                        if isinstance(pf, list):
+                            pf.append(
+                                {
+                                    "id": "pf_elena_last_seen_cargo_check",
+                                    "type": "npc_statement",
+                                    "text": "艾琳娜说父亲昨夜去清点货物后没有回来。",
+                                    "visibility": "discovered",
+                                    "source": "npc_statement",
+                                    "source_label": "艾琳娜",
+                                    "introduced_in_narrative": True,
+                                    "discovered_turn": int(state.flags.get("last_turn", 1) or 1),
+                                    "discovered_at": str(state.location),
+                                }
+                            )
                     else:
                         state.flags["village_panic"] = min(
                             100, int(state.flags.get("village_panic", 35)) + 5
                         )
+                        changes["npc_answer"] = "艾琳娜情绪崩溃，只能反复说“昨晚没回来”，说不清更多细节。"
+                        changes["no_new_information_reason"] = "艾琳娜情绪失控，暂时无法提供更多细节。"
                 if target == "瓦里克":
                     if succeeded:
                         state.faction_reputation["强盗"] = (
@@ -117,16 +172,66 @@ def apply_world_simulation(
                         )
 
     elif action == "investigate":
-        if intent.destination == "仓库" or state.location == "仓库":
+        if intent.target == "thomas_order":
+            state.flags["heard_thomas_order"] = True
+            patrol = resolve_direction_phrase(state, "warehouse") or "村口外侧"
+            changes["npc_answer"] = sanitize_player_text(
+                f"托马斯：『今夜加强{patrol}巡逻，双哨换岗，任何人不得擅离岗位。』",
+                state,
+            )
+            changes["npc_reaction"] = "两名守卫应声离去，脚步消失在木栅外。"
+            changes["clue"] = f"托马斯下令加强{patrol}巡逻"
+            facts = ensure_player_known_facts(state)
+            kf = facts.get("known_facts")
+            if isinstance(kf, list):
+                item = {
+                    "id": "fact_thomas_extra_patrol",
+                    "type": "observation",
+                    "label": f"托马斯下令加强{patrol}巡逻",
+                    "visibility": "discovered",
+                    "source": "npc_order",
+                    "source_label": "托马斯",
+                    "discovered_turn": int(state.flags.get("last_turn", 1) or 1),
+                    "discovered_at": str(state.location),
+                    "description": f"你当场听清托马斯要求加强{patrol}的哨岗与巡逻。",
+                }
+                if not any(isinstance(x, dict) and x.get("id") == item["id"] for x in kf):
+                    kf.append(item)
+        elif (
+            intent.target == "warehouse"
+            or intent.destination == "仓库"
+            or str(intent.raw_input or "").find("仓库") >= 0
+        ):
             state.location = "仓库"
             changes["moved_to"] = "仓库"
             _set_active_npcs(state)
-        if state.location == "仓库":
+        if state.location == "仓库" and (
+            intent.target == "warehouse"
+            or intent.destination == "仓库"
+            or "仓库" in str(intent.raw_input or "")
+        ):
             if succeeded:
                 state.flags["warehouse_searched"] = True
                 state.flags["clue_found"] = True
                 record_investigation_progress(state, 15)
                 changes["clue"] = "带血脚印通向森林方向"
+                facts = ensure_player_known_facts(state)
+                if "仓库" not in facts["known_locations"]:
+                    facts["known_locations"].append("仓库")
+                # 结构化 fact 已写入 known_facts；不再依赖 known_clues
+                facts["known_facts"].append(
+                    {
+                        "id": "clue_bloody_footprints_to_forest",
+                        "type": "clue",
+                        "label": "带血脚印通向森林方向",
+                        "visibility": "discovered",
+                        "source": "player_observation",
+                        "source_label": "现场勘验",
+                        "discovered_turn": int(state.flags.get("last_turn", 1) or 1),
+                        "discovered_at": str(state.location),
+                        "description": "你在地面上确认了一串带血的脚印，延伸向森林方向。",
+                    }
+                )
                 upd = update_npc_from_action(
                     state,
                     "米拉",
@@ -230,7 +335,7 @@ def apply_world_simulation(
             )
         elif dice:
             changes["success_scene"] = (
-                "<p>你静下心来观察四周，隐约觉得应继续调查商人失踪案。</p>"
+                "<p>你静下心来观察四周，隐约觉得应继续追查失踪商人的下落。</p>"
             )
 
     _set_active_npcs(state)

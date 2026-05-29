@@ -8,7 +8,8 @@ export function getOntologyFromState(worldState: GameState | null): WorldOntolog
 }
 
 export function uiTerm(onto: WorldOntology | null, key: string, fallback: string): string {
-  return onto?.ui?.[key] ?? fallback;
+  const v = onto?.ui?.[key];
+  return typeof v === "string" ? v : fallback;
 }
 
 export function eventCategoryLabel(

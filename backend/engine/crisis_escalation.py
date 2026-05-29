@@ -229,7 +229,16 @@ def _apply_merchant_clue(state: GameState) -> None:
     crisis = _ensure_crisis(state)
     crisis["merchant_status"] = "clue_surface"
     _append_clue(state, "马库斯在仓库留下一枚带划痕的银币")
-    add_rumor(state, "有人声称在仓库发现属于马库斯的银币。", "仓库", credibility=0.75)
+    add_rumor(
+        state,
+        "地面出现新的凌乱痕迹，似乎有人匆忙经过。",
+        "仓库",
+        credibility=0.75,
+        source_type="event",
+        source_id="clue_surface",
+        source_label="现场线索",
+        visibility="hidden",
+    )
     _append_anomaly(state, "仓库角落发现一枚带划痕的银币")
 
 
@@ -243,7 +252,17 @@ def _apply_bandit_relocate(state: GameState) -> None:
 
 def _apply_villager_blood(state: GameState) -> None:
     _append_clue(state, "村民在村口附近发现可疑血迹")
-    add_rumor(state, "村口湿土上有新鲜血迹，来源不明。", "村口", credibility=0.65)
+    add_rumor(
+        state,
+        "村口湿土上出现新鲜血迹。",
+        "村口",
+        credibility=0.65,
+        source_type="npc",
+        source_id="villagers",
+        source_label="村民",
+        visibility="public",
+        known_to_player=True,
+    )
     state.flags["village_panic"] = min(100, int(state.flags.get("village_panic", 35)) + 8)
     _append_anomaly(state, "几名村民在湿土上发现了尚未干涸的血迹")
 
@@ -266,6 +285,10 @@ def _apply_mira_rumor(state: GameState) -> None:
         "酒馆",
         known_by=["米拉"],
         credibility=0.55,
+        source_type="npc",
+        source_id="mira",
+        source_label="米拉",
+        visibility="local",
     )
     add_memory(state.npcs["米拉"], "米拉向酒客透露马库斯可能有隐秘交易。")
     _append_anomaly(state, "米拉在酒馆后堂与熟客低声交谈")
@@ -292,7 +315,16 @@ def _apply_merchant_injured(state: GameState) -> None:
     crisis["merchant_status"] = "injured"
     crisis["merchant_location_hint"] = "森林营地"
     _append_clue(state, "有猎人看见受伤商人被带往森林营地")
-    add_rumor(state, "猎人声称看见一名受伤商人被押入黑森林。", "森林小路", credibility=0.5)
+    add_rumor(
+        state,
+        "猎人声称看见一名受伤者被押入黑森林。",
+        "森林小路",
+        credibility=0.5,
+        source_type="npc",
+        source_id="hunter",
+        source_label="猎人",
+        visibility="local",
+    )
     _append_risk_note(state, "失踪者可能仍存活，但处境危险")
 
 
@@ -310,7 +342,16 @@ def _apply_merchant_dead(state: GameState) -> None:
     # 仅当 bandits strong + low investigation + high panic
     crisis["merchant_status"] = "dead"
     _append_anomaly(state, "黑森林边缘发现属于马库斯的个人物品")
-    add_rumor(state, "林边发现商人的行囊，本人仍无下落。", "森林小路", credibility=0.7)
+    add_rumor(
+        state,
+        "林边发现一只破损行囊，本人仍无下落。",
+        "森林小路",
+        credibility=0.7,
+        source_type="event",
+        source_id="found_belongings",
+        source_label="现场发现",
+        visibility="local",
+    )
     state.flags["village_panic"] = min(100, int(state.flags.get("village_panic", 35)) + 12)
     for q in state.quests:
         if q.id == "missing_merchant" and q.status == "active":
@@ -339,7 +380,7 @@ def _can_merchant_die(state: GameState) -> bool:
 
 
 CRISIS_EVENTS: list[CrisisEvent] = [
-    _evt("clue_silver", 20, "【危机】商人在仓库留下了新的痕迹——一枚带划痕的银币。", _apply_merchant_clue),
+    _evt("clue_silver", 20, "【危机】仓库方向似乎出现新的痕迹。", _apply_merchant_clue),
     _evt("bandit_relocate", 20, "【危机】强盗似乎正在转移据点，森林里的足迹改了方向。", _apply_bandit_relocate),
     _evt("villager_blood", 40, "【危机】村民在湿土上发现了可疑的血迹。", _apply_villager_blood),
     _evt("guard_search_fail", 40, "【危机】守卫组织的搜索队一无所获，士气受挫。", _apply_guard_search_fail),
@@ -357,6 +398,10 @@ CRISIS_EVENTS: list[CrisisEvent] = [
 ]
 
 
+def _is_demo_slice(state: GameState) -> bool:
+    return bool(state.flags.get("vertical_slice_demo"))
+
+
 def _pick_tier_event(state: GameState, tier: int, pressure: float) -> CrisisEvent | None:
     eligible = [
         e for e in CRISIS_EVENTS
@@ -366,7 +411,9 @@ def _pick_tier_event(state: GameState, tier: int, pressure: float) -> CrisisEven
     ]
     if not eligible:
         return None
-    # 压力越高，越倾向高影响事件（同 tier 内按 id 权重简化：shuffle with pressure bias）
+    if _is_demo_slice(state):
+        eligible = sorted(eligible, key=lambda e: str(e.get("id", "")))
+        return eligible[0]
     random.shuffle(eligible)
     return eligible[0]
 
@@ -406,8 +453,9 @@ def tick_crisis_escalation(state: GameState) -> list[dict[str, Any]]:
                 crisis["max_tier_reached"] = max(max_tier, t)
                 max_tier = int(crisis.get("max_tier_reached", 0))
 
-    # 高压持续：小概率重复 ambient 危机
-    if pressure >= 55 and random.random() < 0.15:
+    # 高压持续：小概率重复 ambient 危机（演示种子降低随机漂移）
+    ambient_chance = 0.06 if _is_demo_slice(state) else 0.15
+    if pressure >= 55 and random.random() < ambient_chance:
         ambient = _pick_tier_event(state, 40 if pressure < 70 else 60, pressure)
         if ambient and ambient.get("repeatable"):
             ambient["apply"](state)
@@ -462,6 +510,22 @@ def get_crisis_ui(state: GameState) -> dict[str, Any]:
         window_label = ui_label(state, "search_window", "窗口收窄") + " · 紧迫"
 
     onto = ontology_for_state(state)
+    # 只展示已发现/公开的线索与异象（避免 hidden clue 泄露）
+    from engine.world_state import ensure_player_known_facts
+
+    facts = ensure_player_known_facts(state)
+    pf = facts.get("player_facing_facts") if isinstance(facts, dict) else []
+    discovered: list[str] = []
+    if isinstance(pf, list):
+        for f in pf:
+            if not isinstance(f, dict):
+                continue
+            vis = str(f.get("visibility") or "hidden")
+            if vis in ("public", "local", "discovered"):
+                lbl = str(f.get("text") or f.get("label") or "").strip()
+                if lbl:
+                    discovered.append(lbl)
+
     return {
         "pressure": round(pressure, 1),
         "level": level,
@@ -470,8 +534,8 @@ def get_crisis_ui(state: GameState) -> dict[str, Any]:
         "merchant_status_label": status_labels.get(status, "未知"),
         "search_window": search_w,
         "search_window_label": window_label,
-        "recent_anomalies": list(crisis.get("recent_anomalies", []))[-5:],
-        "suspicious_clues": list(crisis.get("suspicious_clues", []))[-5:],
+        "recent_anomalies": [],  # crisis internal，避免提前暴露
+        "suspicious_clues": discovered[-5:],
         "risk_notes": list(crisis.get("risk_notes", []))[-4:],
         "merchant_location_hint": crisis.get("merchant_location_hint")
         or crisis.get("location_hint"),

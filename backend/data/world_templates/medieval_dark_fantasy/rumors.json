@@ -4,13 +4,19 @@
       "text": "黑森林方向最近常有商队失踪，雾中似有东西游荡。",
       "origin": "村口",
       "credibility": 0.6,
-      "spread_to": ["酒馆", "仓库"]
+      "spread_to": ["酒馆", "仓库"],
+      "source_type": "overheard_conversation",
+      "source_id": "villagers_whisper",
+      "source_label": "低声交谈的村民"
     },
     {
-      "text": "有人说昨夜仓库附近有马蹄声，却不见马。",
+      "text": "昨夜村口外侧有马蹄声，却不见马。",
       "origin": "酒馆",
       "credibility": 0.45,
-      "spread_to": ["村口", "森林小路"]
+      "spread_to": ["村口", "森林小路"],
+      "source_type": "npc",
+      "source_id": "mira",
+      "source_label": "米拉"
     }
   ],
   "default_rumor": "黑森林方向最近常有商队失踪，雾中似有东西游荡。"

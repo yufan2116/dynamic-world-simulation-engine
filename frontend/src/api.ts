@@ -1,8 +1,10 @@
 import axios from "axios";
 import type {
   ActionResponse,
+  BranchInfo,
   GameStateResponse,
   GenerateImageResponse,
+  InspectorResponse,
   StartGameResponse,
   TemplatesResponse,
 } from "./types";
@@ -39,13 +41,45 @@ export async function startDemoGame(): Promise<StartGameResponse> {
   return data;
 }
 
-export async function submitAction(playerInput: string): Promise<ActionResponse> {
-  const { data } = await api.post<ActionResponse>("/game/action", { player_input: playerInput });
+export async function submitAction(
+  playerInput: string,
+  selectedChoiceText?: string,
+  actionId?: string,
+  intentPayload?: unknown
+): Promise<ActionResponse> {
+  const { data } = await api.post<ActionResponse>("/game/action", {
+    player_input: playerInput,
+    selected_choice_text: selectedChoiceText ?? null,
+    action_id: actionId ?? null,
+    intent_payload: intentPayload ?? null,
+  });
   return data;
 }
 
 export async function fetchGameState(): Promise<GameStateResponse> {
   const { data } = await api.get<GameStateResponse>("/game/state");
+  return data;
+}
+
+export async function fetchInspector(turn?: number): Promise<InspectorResponse> {
+  const { data } = await api.get<InspectorResponse>("/game/inspector", {
+    params: turn != null ? { turn } : undefined,
+  });
+  return data;
+}
+
+export async function rewindToTurn(turn: number): Promise<GameStateResponse> {
+  const { data } = await api.post<GameStateResponse>("/game/rewind", { turn });
+  return data;
+}
+
+export async function forkFromTurn(fromTurn: number, label?: string): Promise<GameStateResponse> {
+  const { data } = await api.post<GameStateResponse>("/game/fork", { from_turn: fromTurn, label });
+  return data;
+}
+
+export async function fetchBranches(): Promise<{ branches: BranchInfo[] }> {
+  const { data } = await api.get<{ branches: BranchInfo[] }>("/game/branches");
   return data;
 }
 

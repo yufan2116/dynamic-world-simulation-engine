@@ -171,6 +171,10 @@ def tick_npc_ai(state: GameState) -> list[dict[str, Any]]:
                     "米拉私下说：马库斯恐怕卷入了一笔不该碰的买卖。",
                     "酒馆",
                     known_by=["米拉"],
+                    source_type="npc",
+                    source_id="mira",
+                    source_label="米拉",
+                    visibility="local",
                 )
             events.append({
                 "type": "npc_action",

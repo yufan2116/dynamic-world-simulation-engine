@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,24 @@ CREATE TABLE IF NOT EXISTS game_state (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     state_json TEXT NOT NULL,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS branches (
+    branch_id TEXT PRIMARY KEY,
+    seed_id TEXT NOT NULL,
+    template_id TEXT NOT NULL,
+    parent_branch_id TEXT,
+    fork_turn INTEGER,
+    label TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS snapshots (
+    branch_id TEXT NOT NULL,
+    turn INTEGER NOT NULL,
+    state_json TEXT NOT NULL,
+    events_json TEXT NOT NULL,
+    rng_state_b64 TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (branch_id, turn)
 );
 CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,6 +151,8 @@ async def clear_game() -> None:
     await init_db()
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("DELETE FROM game_state")
+        await db.execute("DELETE FROM branches")
+        await db.execute("DELETE FROM snapshots")
         await db.execute("DELETE FROM events")
         await db.execute("DELETE FROM npc_memories")
         await db.execute("DELETE FROM images")
@@ -144,6 +165,30 @@ async def insert_event(turn: int, event_type: str, payload: dict[str, Any]) -> N
             "INSERT INTO events (turn, event_type, payload_json) VALUES (?, ?, ?)",
             (turn, event_type, json.dumps(payload, ensure_ascii=False)),
         )
+        await db.commit()
+
+
+async def clear_events() -> None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM events")
+        await db.commit()
+
+
+async def insert_events_bulk(rows: list[dict[str, Any]]) -> None:
+    """按顺序批量写回 events（用于 rewind/fork 恢复）。"""
+    if not rows:
+        return
+    async with aiosqlite.connect(DB_PATH) as db:
+        for r in rows:
+            await db.execute(
+                "INSERT INTO events (turn, event_type, payload_json, created_at) VALUES (?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP))",
+                (
+                    int(r.get("turn", 0)),
+                    str(r.get("event_type", "")),
+                    json.dumps(r.get("payload", {}), ensure_ascii=False),
+                    r.get("created_at"),
+                ),
+            )
         await db.commit()
 
 
@@ -166,6 +211,131 @@ async def get_events(limit: int = 100) -> list[dict[str, Any]]:
             }
         )
     return result
+
+
+async def get_events_range(*, from_turn: int | None = None, to_turn: int | None = None) -> list[dict[str, Any]]:
+    """按回合区间读取 events（正序）。"""
+    q = "SELECT turn, event_type, payload_json, created_at FROM events"
+    params: list[Any] = []
+    where: list[str] = []
+    if from_turn is not None:
+        where.append("turn >= ?")
+        params.append(int(from_turn))
+    if to_turn is not None:
+        where.append("turn <= ?")
+        params.append(int(to_turn))
+    if where:
+        q += " WHERE " + " AND ".join(where)
+    q += " ORDER BY id ASC"
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(q, params) as cur:
+            rows = await cur.fetchall()
+
+    return [
+        {
+            "turn": r["turn"],
+            "event_type": r["event_type"],
+            "payload": json.loads(r["payload_json"]),
+            "created_at": r["created_at"],
+        }
+        for r in rows
+    ]
+
+
+async def create_branch(
+    *,
+    seed_id: str,
+    template_id: str,
+    parent_branch_id: str | None = None,
+    fork_turn: int | None = None,
+    label: str | None = None,
+) -> str:
+    branch_id = str(uuid.uuid4())
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """
+            INSERT INTO branches (branch_id, seed_id, template_id, parent_branch_id, fork_turn, label)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (branch_id, seed_id, template_id, parent_branch_id, fork_turn, label),
+        )
+        await db.commit()
+    return branch_id
+
+
+async def list_branches() -> list[dict[str, Any]]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """
+            SELECT branch_id, seed_id, template_id, parent_branch_id, fork_turn, label, created_at
+            FROM branches ORDER BY created_at ASC
+            """
+        ) as cur:
+            rows = await cur.fetchall()
+    return [dict(r) for r in rows]
+
+
+async def save_snapshot(
+    *,
+    branch_id: str,
+    turn: int,
+    state_dict: dict[str, Any],
+    events: list[dict[str, Any]],
+    rng_state_b64: str | None,
+) -> None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """
+            INSERT INTO snapshots (branch_id, turn, state_json, events_json, rng_state_b64)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(branch_id, turn) DO UPDATE SET
+                state_json = excluded.state_json,
+                events_json = excluded.events_json,
+                rng_state_b64 = excluded.rng_state_b64,
+                created_at = CURRENT_TIMESTAMP
+            """,
+            (
+                branch_id,
+                int(turn),
+                json.dumps(state_dict, ensure_ascii=False),
+                json.dumps(events, ensure_ascii=False),
+                rng_state_b64,
+            ),
+        )
+        await db.commit()
+
+
+async def load_snapshot(*, branch_id: str, turn: int) -> dict[str, Any] | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT branch_id, turn, state_json, events_json, rng_state_b64, created_at FROM snapshots WHERE branch_id = ? AND turn = ?",
+            (branch_id, int(turn)),
+        ) as cur:
+            row = await cur.fetchone()
+            if not row:
+                return None
+            return {
+                "branch_id": row["branch_id"],
+                "turn": row["turn"],
+                "state": json.loads(row["state_json"]),
+                "events": json.loads(row["events_json"]),
+                "rng_state_b64": row["rng_state_b64"],
+                "created_at": row["created_at"],
+            }
+
+
+async def list_snapshots(branch_id: str) -> list[int]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT turn FROM snapshots WHERE branch_id = ? ORDER BY turn ASC",
+            (branch_id,),
+        ) as cur:
+            rows = await cur.fetchall()
+    return [int(r[0]) for r in rows]
 
 
 async def save_npc_memories(npcs: dict[str, list[str]]) -> None:
